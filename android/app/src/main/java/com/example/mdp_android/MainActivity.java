@@ -18,15 +18,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new ControlsFragment());
+        replaceFragment(new MapFragment());
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             int itemId = item.getItemId(); // Get the selected item's ID
 
-            if (itemId == R.id.controls) {
-                replaceFragment(new ControlsFragment());
-            } else if (itemId == R.id.message) {
+             if (itemId == R.id.message) {
                 replaceFragment(new MessageFragment());
             } else if (itemId == R.id.map) {
                 replaceFragment(new MapFragment());

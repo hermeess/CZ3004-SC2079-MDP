@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
-        android:id="@+id/controls"
-        android:title="Controls"
-        android:icon="@drawable/baseline_keyboard_control_key_24"
+        android:id="@+id/map"
+        android:title="Map"
+        android:icon="@drawable/baseline_location_searching_24"
         />
     <item
         android:id="@+id/message"
         android:title="Message"
         android:icon="@drawable/baseline_announcement_24"
-        />
-    <item
-        android:id="@+id/map"
-        android:title="Map"
-        android:icon="@drawable/baseline_location_searching_24"
         />
     <item
         android:id="@+id/settings"

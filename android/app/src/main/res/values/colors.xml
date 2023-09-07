@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="grid_border_color">#000000</color>
+    <color name="grid_cell_color">#CCCCCC</color>
 </resources>
