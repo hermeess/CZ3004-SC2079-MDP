@@ -134,7 +134,7 @@ class AndroidLink(Link):
             uuid = '94f39d29-7d6d-437d-973b-fba39e49d4ee'
 
             # Advertise
-            bluetooth.advertise_service(self.server_sock, "MDP-Group2-RPi", service_id=uuid, service_classes=[
+            bluetooth.advertise_service(self.server_sock, "MDP-Group24-RPi", service_id=uuid, service_classes=[
                                         uuid, bluetooth.SERIAL_PORT_CLASS], profiles=[bluetooth.SERIAL_PORT_PROFILE])
 
             self.logger.info(
