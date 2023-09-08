@@ -1,0 +1,12 @@
+# For now: not sure if everything is necessary
+# this is just my setting versions
+
+Flask==2.3.3
+Flask-Cors==4.0.0
+matplotlib==3.7.1
+numpy==1.24.2
+packaging==23.0
+pandas==2.0.0
+Pillow==9.4.0
+PyYAML==6.0
+torch==2.0.1
