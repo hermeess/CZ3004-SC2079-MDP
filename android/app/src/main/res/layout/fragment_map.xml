@@ -33,22 +33,13 @@
         android:layout_marginRight="20dp"
         android:background="@drawable/grid_background">
     </GridLayout>
-    <LinearLayout
-        android:id="@+id/rowLabelLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_below="@id/gridLayout"
-        android:layout_marginTop="20dp">
-        <!-- Row labels will be added dynamically -->
-    </LinearLayout>
 
     <!-- LinearLayout for buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/gridLayout"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         android:gravity="center">
 
@@ -59,7 +50,9 @@
             android:layout_below="@id/gridLayout"
             android:orientation="vertical"
             android:gravity="start"
-            android:layout_marginRight="40dp">
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="20dp"
+            >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -212,6 +205,12 @@
         </androidx.gridlayout.widget.GridLayout>
         <!-- Buttons go here -->
         <Button
+            android:id="@+id/buttonSendObstacle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send to RPi" />
+
+        <Button
             android:id="@+id/buttonRotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -222,6 +221,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Change" />
+
+        <TextView
+            android:id="@+id/robotPositionTextView"
+            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/gridLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="Robot: X: -1, Y: -1, Direction: "
+            android:textSize="16sp"
+            android:textColor="#000000" />
     </LinearLayout>
 
 </RelativeLayout>

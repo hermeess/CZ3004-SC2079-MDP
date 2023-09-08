@@ -16,10 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -82,7 +84,11 @@ public class MapFragment extends Fragment {
     private String selectedDirection = ""; // Variable to store the selected direction
     private ImageView selectedImageView = null; // Variable to store the selected ImageView
 
-    private HashMap<String, ImageInfo> imageInfoMap = new HashMap<>(); //used to store my imageInfo for all images.
+    private final HashMap<String, ImageInfo> imageInfoMap = new HashMap<>(); // Used to store my imageInfo for all images.
+
+    private final HashMap<String, JSONObject> obstacleMap = new HashMap<>(); // Used to store the obstacle to send to bluetooth.
+
+    private final int[] rowArr = new int[21]; // Used to store the row tick labels
 
     public MapFragment() {
         // Required empty public constructor
@@ -119,7 +125,7 @@ public class MapFragment extends Fragment {
    Note:
    Functions to be called:
    1.To update the robot, call the updateRobot function alongside the new x,y coordinates,direction and type.
-   2.To update the target, call the updateTarget function alongside the targetid & obstacle id
+   2.To update the target, call the updateTarget function alongside the target id & obstacle id
 
    Data structure that is keeping track of all the image etc:
    A hashmap is used to keep track of all the images.
@@ -130,7 +136,6 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
-        HorizontalScrollView horizontalScrollView = rootView.findViewById(R.id.horizontalScrollView);
         LinearLayout linearLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
         GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
 
@@ -140,7 +145,8 @@ public class MapFragment extends Fragment {
         Button buttonRight = rootView.findViewById(R.id.buttonRight);
         Button buttonUp = rootView.findViewById(R.id.buttonUp);
         Button buttonDown = rootView.findViewById(R.id.buttonDown);
-        //this two are part of testing (can be removed afterwards)
+        Button buttonSendToRpi = rootView.findViewById(R.id.buttonSendObstacle);
+        // This two are part of testing (can be removed afterwards)
         Button buttonRotate = rootView.findViewById(R.id.buttonRotate);
         Button buttonChange = rootView.findViewById(R.id.buttonChange);
 
@@ -148,9 +154,8 @@ public class MapFragment extends Fragment {
         buttonLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call your moveRobot function with the appropriate parameters
-                // For example, to move left, you can decrease the column position by 1
-                ImageInfo robotInfo = imageInfoMap.get("obstacle_0");
+                // Call updateRobot function to move left
+                ImageInfo robotInfo = imageInfoMap.get("robot");
                 if(robotInfo.getCol() != -1 && robotInfo.getRow() != -1) {
                     updateRobot(robotInfo.getRow(), robotInfo.getCol() - 1, robotInfo.getDirection(), "MOVE");
                 }
@@ -160,8 +165,8 @@ public class MapFragment extends Fragment {
         buttonRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // For example, to move right, you can increase the column position by 1
-                ImageInfo robotInfo = imageInfoMap.get("obstacle_0");
+                //  Call updateRobot function to move right
+                ImageInfo robotInfo = imageInfoMap.get("robot");
                 if(robotInfo.getCol() != -1 && robotInfo.getRow() != -1) {
                     updateRobot(robotInfo.getRow(), robotInfo.getCol() + 1, robotInfo.getDirection(), "MOVE");
                 }
@@ -171,8 +176,8 @@ public class MapFragment extends Fragment {
         buttonUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // For example, to move up, you can decrease the row position by 1
-                ImageInfo robotInfo = imageInfoMap.get("obstacle_0");
+                // Call updateRobot function to move up
+                ImageInfo robotInfo = imageInfoMap.get("robot");
                 if(robotInfo.getCol() != -1 && robotInfo.getRow() != -1) {
                     updateRobot(robotInfo.getRow() + 1, robotInfo.getCol(), robotInfo.getDirection(), "MOVE");
                 }
@@ -182,20 +187,27 @@ public class MapFragment extends Fragment {
         buttonDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // For example, to move down, you can increase the row position by 1
-                ImageInfo robotInfo = imageInfoMap.get("obstacle_0");
+                // Call updateRobot function to move down
+                ImageInfo robotInfo = imageInfoMap.get("robot");
                 if(robotInfo.getCol() != -1 && robotInfo.getRow() != -1) {
                     updateRobot(robotInfo.getRow() - 1, robotInfo.getCol(), robotInfo.getDirection(), "MOVE");
                 }
             }
         });
 
+        buttonSendToRpi.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                // Call sendObstacleToRpi here
+                sendObstacleToRpi();
+            }
+        });
+
         buttonRotate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call your moveRobot function with the appropriate parameters
-                // For example, to rotate, you can change the direction
-                ImageInfo robotInfo = imageInfoMap.get("obstacle_0");
+                // For testing purpose, hardcoded to show that robot direction will change
+                ImageInfo robotInfo = imageInfoMap.get("robot");
                 if(robotInfo.getCol() != -1 && robotInfo.getRow() != -1) {
                     updateRobot(robotInfo.getRow(), robotInfo.getCol(), "North", "ROBOT");
                 }
@@ -205,24 +217,32 @@ public class MapFragment extends Fragment {
         buttonChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // For example, to change the image for "obstacle_5" from obstacle_6
-                updateTarget("5", "6");
+                // Hardcoded to show that target & obstacle will change if mismatch & background will be changed
+                updateTarget("11", "12");
             }
         });
 
-        //create my grid view
+
+        // Setting a rowArr for row tick labels
+        int rowVal = 21;
+        for(int i = 0; i < 21; i++){
+            rowArr[i] = rowVal;
+            rowVal--;
+        }
+
+        // Create my grid view
         for (int row = 0; row < 21; row++) {
             for (int col = 0; col < 21; col++) {
                 if(col == 0 && row == 0){
                     continue;
                 }
-                //row ticks
+                // Generation of row ticks
                 if(col == 0){
                     TextView rowLabelTextView = new TextView(requireContext());
-                    rowLabelTextView.setText(String.valueOf(row));
+                    rowLabelTextView.setText(String.valueOf(rowArr[row]));
                     rowLabelTextView.setTextSize(10);
 
-                    // Set layout parameters for the column label
+                    // Set layout parameters for the row ticks
                     GridLayout.LayoutParams rowLabelParams = new GridLayout.LayoutParams();
                     rowLabelParams.width = 0;
                     rowLabelParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -234,7 +254,8 @@ public class MapFragment extends Fragment {
 
                     // Add the row label to your gridLayout
                     gridLayout.addView(rowLabelTextView);
-                } else if(row == 0){ //col ticks
+
+                } else if(row == 0){ // Generation of col ticks
                     TextView colLabelTextView = new TextView(requireContext());
                     colLabelTextView.setText(String.valueOf(col));
                     colLabelTextView.setTextSize(10);
@@ -252,8 +273,6 @@ public class MapFragment extends Fragment {
                     // Add the column label to your gridLayout
                     gridLayout.addView(colLabelTextView);
                 } else{
-
-
                 // Create a new ImageView for each cell
                 final ImageView cellImageView = new ImageView(requireContext());
 
@@ -261,11 +280,11 @@ public class MapFragment extends Fragment {
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
                 params.width = 0;
                 params.height = 0;
-                params.rowSpec = GridLayout.spec(row, 1f);
+                params.rowSpec = GridLayout.spec(rowArr[row], 1f);
                 params.columnSpec = GridLayout.spec(col, 1f);
                 params.setMargins(10,10,10,10);
 
-                // Set background for the cellImageView
+                // Set background color for the cellImageView
                 cellImageView.setBackgroundColor(Color.parseColor("#D3D3D3"));
 
                 // Add the ImageView to the GridLayout
@@ -282,11 +301,18 @@ public class MapFragment extends Fragment {
 
             // Set the image resource based on the drawable name
             int drawableResource;
-            //if its 0, i will load the robot icon
+            // If its 0, i will load the robot icon
             if(i == 0){
-                drawableResource = getResources().getIdentifier("robot_icon", "drawable", requireContext().getPackageName());
-            } else{ //loading other obstacles
-                drawableResource = getResources().getIdentifier("obstacle_" + i, "drawable", requireContext().getPackageName());
+                drawableResource = R.drawable.robot_icon;
+
+                imageView.setTag("robot");
+            } else{ // Loading other obstacles
+                int obstacleId = i + 10;
+                String resourceName = "obstacle_" + obstacleId;
+                drawableResource = getResources().getIdentifier(resourceName, "drawable", requireContext().getPackageName());
+
+                // Assign a tag to the ImageView to represent the drawable
+                imageView.setTag("obstacle_" + obstacleId); // Use a unique identifier for each drawable to add into hash maps
             }
             imageView.setImageResource(drawableResource);
 
@@ -294,9 +320,6 @@ public class MapFragment extends Fragment {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
             params.setMargins(20, 0, 20, 0);
             imageView.setLayoutParams(params);
-
-            // Assign a tag to the ImageView to represent the drawable
-            imageView.setTag("obstacle_" + i); // Use a unique identifier for each drawable to add into hash
 
             // Add the OnLongClickListener to start dragging
             imageView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -330,11 +353,9 @@ public class MapFragment extends Fragment {
                 @Override
                 public boolean onDrag(View v, DragEvent event) {
                     int action = event.getAction();
-                    switch (action) {
-                        case DragEvent.ACTION_DROP:
+                    if(action == DragEvent.ACTION_DROP){
                             // Handle the drop event
                             ImageView draggedImage = (ImageView) event.getLocalState();
-                            GridLayout targetGrid = (GridLayout) gridLayout;
 
                             // Remove the image from its original parent (the GridLayout)
                             ViewGroup owner = (ViewGroup) draggedImage.getParent();
@@ -345,41 +366,41 @@ public class MapFragment extends Fragment {
                             // Retrieve the tag to identify the dropped drawable
                             String drawableTag = (String) draggedImage.getTag();
 
-                            //reset the imageInfo back to the default values.
+                            // Reset the imageInfo back to the default values.
                             ImageInfo imageInfo = imageInfoMap.get(drawableTag);
                             if (imageInfo != null) {
                                 imageInfo.setDirection("None");
                                 imageInfo.setRow(-1);
                                 imageInfo.setCol(-1);
-                                //log to see if it is resets to original values
-                                Log.d("ImageInfo", "ImageView: " + draggedImage.toString() +
-                                        " Row: " + imageInfo.getRow() +
+                                // Log to see if it is resets to original values
+                                Log.d("ImageInfo", " Row: " + imageInfo.getRow() +
                                         " Column: " + imageInfo.getCol() +
                                         " Direction: " + imageInfo.getDirection());
                             }
 
                             setGridCellBorderColor("None");
                             // If the drop position is not valid within the grid,
-                            // set appropriate layout parameters for the image
+                            // Set appropriate layout parameters for the image
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
                             params.setMargins(20, 0, 20, 0);
                             draggedImage.setLayoutParams(params);
+                            draggedImage.setPadding(0,0,0,0);
 
                             // Add ImageView to the HorizontalScrollView
                             linearLayout.addView(draggedImage);
                             draggedImage.setVisibility(View.VISIBLE);
 
-                            //>>Bluetooth can send "Remove" e.g to remove the obstacle from map etc
+                            // Remove item from obstacleMap
+                            obstacleMap.remove(drawableTag);
+                            Log.d("Updated Obstacle Map", obstacleMap.toString());
                             return true;
-                        default:
-                            break;
                     }
                     return true;
                 }
             });
             String imageTag = (String) imageView.getTag();
 
-            //initialise the imageInfo for each imageView
+            // Initialise the imageInfo for each imageView
             ImageInfo imageInfo = new ImageInfo(-1, -1, "None");
             imageInfoMap.put(imageTag, imageInfo);
 
@@ -409,7 +430,6 @@ public class MapFragment extends Fragment {
                 // Set the border color of the selected grid cell based on the direction
                 setGridCellBorderColor(selectedDirection);
 
-                // Dismiss the dialog
                 dialog.dismiss();
             }
         });
@@ -446,22 +466,36 @@ public class MapFragment extends Fragment {
             if (imageInfo != null) {
                 imageInfo.setDirection(direction);
 
-
                 //Send the data to bluetooth here, this is the one with the updated direction + x,y
                 Log.d("ImageInfo", imageInfo.toString());
                 //Bluetooth>>sendIMageInfoToBluetooth(imageInfo)
+                //maybe consider sending the tool for deliverable purpose, in actual test maybe just
+                //send the entire JSON as per request by RPi team.
             }
 
             // Log the ImageInfo only if it's not null
             if (imageInfo != null) {
-                Log.d("ImageInfo", "Image Tag: " + selectedImageViewTag.toString() +
+                Log.d("ImageInfo", "Image Tag: " + selectedImageViewTag +
                         " Row: " + imageInfo.getRow() +
                         " Column: " + imageInfo.getCol() +
                         " Direction: " + imageInfo.getDirection());
+
+                // Adding the obstacle to obstacle map;
+                try {
+                    if(!selectedImageViewTag.equals("robot")){
+                        addObstacleToMap(selectedImageViewTag, imageInfo);
+                    } else{
+                        TextView robotPositionTextView = rootView.findViewById(R.id.robotPositionTextView);
+                        robotPositionTextView.setText("Robot: X:" + imageInfo.getCol() + " , " +
+                                "Y:" + imageInfo.getRow() + " , " +
+                                "Direction: " + imageInfo.getDirection());
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
-
 
     public class MyDragListener implements View.OnDragListener {
         @Override
@@ -469,7 +503,7 @@ public class MapFragment extends Fragment {
             int action = event.getAction();
             switch (action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    // Check if this is a valid drop target (your 20x20 grid)
+                    // Check if this is a valid drop target (20x20 grid)
                     if (v.getId() == R.id.gridLayout) {
                         return true;
                     }
@@ -488,19 +522,7 @@ public class MapFragment extends Fragment {
                     int column = getEventColumn(targetGrid, event);
                     int row = getEventRow(targetGrid, event);
 
-                    // Update the image's row and column in the map
-                    String draggedImageTag = (String) draggedImage.getTag();
-                    ImageInfo imageInfo = imageInfoMap.get(draggedImageTag);
-                    if (imageInfo != null) {
-                        imageInfo.setRow(row);
-                        imageInfo.setCol(column);
-                        Log.d("ImageInfo", "ImageTag: " + draggedImageTag +
-                                " Row: " + imageInfo.getRow() +
-                                " Column: " + imageInfo.getCol() +
-                                " Direction: " + imageInfo.getDirection());
-                    }
-
-                    if (row >= 0 && column >= 0 && v == targetGrid) {
+                    if (row >= 1 && column >= 1) {
                         // Remove the image from its original parent (the selected grid cell)
                         ViewGroup owner = (ViewGroup) draggedImage.getParent();
                         if (owner != null) {
@@ -518,23 +540,50 @@ public class MapFragment extends Fragment {
 
                         // Add the image to the specified position in the grid
                         targetGrid.addView(draggedImage);
+                        draggedImage.setPadding(0,10,0,10);
                         draggedImage.setVisibility(View.VISIBLE);
 
-                        //Bluetooth>>can send the bluetooth information over here, but over here the details would
-                        //be x,y, direction="None", unless direction is set, ie to say the obstacle is
-                        //moved on the map.
+                        // Update the image's row and column in the map
+                        String draggedImageTag = (String) draggedImage.getTag();
+                        ImageInfo imageInfo = imageInfoMap.get(draggedImageTag);
 
-                        //have to put in this branch as the below one is checking if its outside of the grid.
+                        if (imageInfo != null) {
+                            imageInfo.setRow(rowArr[row]);
+                            imageInfo.setCol(column);
+                            Log.d("ImageInfo", "ImageTag: " + draggedImageTag +
+                                    " Row: " + imageInfo.getRow() +
+                                    " Column: " + imageInfo.getCol() +
+                                    " Direction: " + imageInfo.getDirection());
+                            // Adding the obstacle to obstacle map;
+                            try {
+                                if(!draggedImageTag.equals("robot")){
+                                    addObstacleToMap(draggedImageTag, imageInfo);
+                                } else{
+                                    TextView robotPositionTextView = rootView.findViewById(R.id.robotPositionTextView);
+                                    robotPositionTextView.setText("Robot: X:" + imageInfo.getCol() + " , " +
+                                            "Y:" + imageInfo.getRow() + " , " +
+                                            "Direction: " + imageInfo.getDirection());
 
+                                }
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                            //Bluetooth>>can send the bluetooth information over here, but over here the details would
+                            //be x,y, direction="None", unless direction is set, ie to say the obstacle is
+                            //already on the map and is just being moved.
+                            //have to put in this branch as the below one is checking if its outside of the grid.
+                            //Again maybe just send the info to the tool for deliverable purpose.
+                            //Actual test send the way JSON as a whole as requested by RPi.
+                        }
                     } else if (v != targetGrid) {
                         // If the drop position is not valid within the grid,
                         // set appropriate layout parameters for the image
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
-                        params.setMargins(20, 0, 20, 0); // Set margins (left, top, right, bottom)
+                        params.setMargins(20, 0, 20, 0);
                         draggedImage.setLayoutParams(params);
 
                         // Append the image to the end of the LinearLayout
-                        LinearLayout horizontalLayout = (LinearLayout) v.findViewById(R.id.horizontalScrollViewLayout);
+                        LinearLayout horizontalLayout = v.findViewById(R.id.horizontalScrollViewLayout);
                         if (horizontalLayout != null) {
                             horizontalLayout.addView(draggedImage);
                             draggedImage.setVisibility(View.VISIBLE);
@@ -568,15 +617,19 @@ public class MapFragment extends Fragment {
     //call this to update the robot's position.
     //>>Bluetooth to call this as well when receiving info from RPI e.g "ROBOT, 3,2,west"
     //>>Bluetooth to call this when sending info to RPI e.g "MOVE, 3,2, west".
+    //>>do double check with RPi if move controls are part of their commands
+
+    // NOTE: When receiving from RPi & algo team need to +1 to row and col.
+    // Likewise if sending to RPi & algo, -1 to row and col.
     private void updateRobot(int newRow, int newCol, String direction, String action) {
         // Find the robot's ImageView by its tag, robot's tag is hardcoded to be obstacle_0
-        ImageView robotImageView = rootView.findViewWithTag("obstacle_0");
-        selectedImageView = (ImageView) robotImageView;
-        selectedGridCell = (ImageView) robotImageView;
+        ImageView robotImageView = rootView.findViewWithTag("robot");
+        selectedImageView = robotImageView;
+        selectedGridCell = robotImageView;
 
-        if (robotImageView != null) {
+        if (robotImageView != null && newRow < 21 && newCol < 21 && newRow > 0 && newCol > 0) {
             // Update the robot's position in the ImageInfo map
-            ImageInfo robotInfo = imageInfoMap.get("obstacle_0");
+            ImageInfo robotInfo = imageInfoMap.get("robot");
             robotInfo.setRow(newRow);
             robotInfo.setCol(newCol);
             robotInfo.setDirection(direction);
@@ -584,21 +637,25 @@ public class MapFragment extends Fragment {
 
             // Calculate the position in the GridLayout
             GridLayout.LayoutParams params = (GridLayout.LayoutParams) robotImageView.getLayoutParams();
-            params.rowSpec = GridLayout.spec(newRow, 1f);
+            params.rowSpec = GridLayout.spec(rowArr[newRow], 1f);
             params.columnSpec = GridLayout.spec(newCol, 1f);
 
             // Update the ImageView's layout parameters
             robotImageView.setLayoutParams(params);
+
+            Log.d("Robot coors", "Row:" + robotInfo.getRow() + "Col:" + robotInfo.getCol());
         }
-        if(action == "MOVE"){
-            //>> bluetooth Send the details to RPI for robot to move;
+        // If action is by button click.
+        if(action.equals("MOVE")){
+            //>> bluetooth Send the details to RPi for robot to move;
+            //need to -1 from row and col when sending to RPI;
         }
     }
 
 
 
-    //Call this to update the target's image + cell background simultaneously.
-    //Bluetooth>>Bluetooth to call this to update the target's background
+    // Call this to update the target's image + cell background simultaneously.
+    //>>Bluetooth to call this to update the target's background
     private void updateTarget(String target, String obstacle_id) {
         String targetTag = "obstacle_" + target;
         String obstacleTag = "obstacle_" + obstacle_id;
@@ -607,11 +664,10 @@ public class MapFragment extends Fragment {
 
         // Set the image resource based on the drawable name
         int drawableResource;
-        //if its 0, i will load the robot icon
         drawableResource = getResources().getIdentifier(targetTag, "drawable", requireContext().getPackageName());
         targetImageView.setImageResource(drawableResource);
 
-        //First case if target != obstacle, observed target is not the intended one.
+        // First case if target != obstacle, observed target is not the obstacle.
         if (targetImageView != null && obstacleImageView != null && !obstacleTag.equals(targetTag)) {
             ImageInfo obstacleInfo = imageInfoMap.get(obstacleTag);
             ImageInfo targetInfo = imageInfoMap.get(targetTag);
@@ -623,15 +679,15 @@ public class MapFragment extends Fragment {
             targetInfo.setCol(obstacleCol);
             targetInfo.setDirection(obstacleInfo.getDirection());
 
-            //reset obstacleImageView first
-            selectedImageView = (ImageView) obstacleImageView;
-            selectedGridCell = (ImageView) obstacleImageView;
+            // Reset obstacleImageView first
+            selectedImageView = obstacleImageView;
+            selectedGridCell = obstacleImageView;
             selectedGridCell.setBackgroundColor(Color.parseColor("#D3D3D3"));
 
-            //change the target grid cell's background to black to denote found.
+            // Change the target grid cell's background to black to denote found.
             //have to update selectedImageView and selectedGridCell
-            selectedImageView = (ImageView) targetImageView;
-            selectedGridCell = (ImageView) targetImageView;
+            selectedImageView = targetImageView;
+            selectedGridCell = targetImageView;
             selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
 
             // Remove the targetImageView from its current parent
@@ -644,10 +700,11 @@ public class MapFragment extends Fragment {
             GridLayout.LayoutParams targetParams = new GridLayout.LayoutParams();
             targetParams.width = 0;
             targetParams.height = 0;
-            targetParams.rowSpec = GridLayout.spec(targetInfo.getRow(), 1f);
+            targetParams.rowSpec = GridLayout.spec(rowArr[targetInfo.getRow()], 1f);
             targetParams.columnSpec = GridLayout.spec(targetInfo.getCol(), 1f);
             targetParams.setMargins(10, 10, 10, 10);
-            targetImageView.setLayoutParams(targetParams); // Set new LayoutParams for the targetImageView
+            targetImageView.setPadding(0, 10, 0, 10);
+            targetImageView.setLayoutParams(targetParams);
 
             GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
             if (gridLayout != null) {
@@ -666,19 +723,86 @@ public class MapFragment extends Fragment {
             obstacleInfo.setDirection("None");
             obstacleInfo.setRow(-1);
             obstacleInfo.setCol(-1);
+            obstacleImageView.setPadding(0,0,0,0);
 
             // Add the obstacle image to the horizontal layout
             LinearLayout horizontalLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
             if (horizontalLayout != null) {
                 horizontalLayout.addView(obstacleImageView);
             }
-            Log.d("Change Image", "Change Success " + targetInfo.getCol() + targetInfo.getRow());
         } else if(targetImageView != null && obstacleImageView != null && obstacleTag.equals(targetTag)){
-            //at this point obstacle image is the correct one so can just change this obstacle image.
-            selectedImageView = (ImageView) obstacleImageView;
-            selectedGridCell = (ImageView) obstacleImageView;
-            //change cell to found color
+            // At this point obstacle image is the correct one so can just change this obstacle image's background
+            selectedImageView = obstacleImageView;
+            selectedGridCell = obstacleImageView;
+            // Change cell to found color
             selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
         }
     }
+
+    // Convert imageInfo to obstacleID
+    private void addObstacleToMap(String imageInfoTag, ImageInfo imageInfo) throws JSONException {
+        int obstacle_id = obstacleMap.size()+1;
+        int dirs;
+        switch(imageInfo.getDirection()) {
+            case "North":
+                dirs = 90;
+                break;
+            case "South":
+                dirs = -90;
+                break;
+            case "West":
+                dirs = 180;
+                break;
+            case "East":
+                dirs = 0;
+                break;
+            default:
+                dirs = -1;
+                break;
+        }
+        JSONObject item = new JSONObject();
+        item.put("obstacle_id", obstacle_id);
+        item.put("x",imageInfo.getCol()-1);
+        item.put("y", imageInfo.getRow()-1);
+        item.put("dir", dirs);
+        // Add obstacleInfo to hashmap
+        obstacleMap.put(imageInfoTag, item);
+    }
+
+    /*
+        >>Bluetooth
+    this is the json format to RPi (Check with RPi team again), JSON object's key might need to be changed.
+    current format is
+    {imageTag:
+        {
+            "obstacle_id": 2,
+            "x": 1,
+            "y":1,
+            "dir": 180
+         }
+     }
+    */
+    private void sendObstacleToRpi(){
+        JSONObject json = new JSONObject(obstacleMap);
+        Log.d("Obstacle json", json.toString());
+    }
 }
+
+/*
+
+//>>Data to be sent as requested by ALGO team
+{x: "", y: "", direction: "", obstacle_id:""}
+where directions:
+    90: North
+    180: West
+    0: East
+    -90: South
+ */
+
+//From RPi team
+//start command
+//robot start at 1,1
+//One obstacle list one short.
+
+//ky send uuid to JH
+//when send to algo team minus 1 from row and col, theirs is 0 index based
