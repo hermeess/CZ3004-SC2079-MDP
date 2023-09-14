@@ -4,6 +4,8 @@ import torch
 import os
 import cv2
 import numpy as np
+import glob
+import math
 
 def load_model():
     # model = torch.hub.load('./', 'custom', path='week8.pt', source='local')
@@ -56,7 +58,7 @@ def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), te
 
     # save raw image
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(f"image_results/raw_image_{image_name}.jpg", img)
+    cv2.imwrite(f"image_results/raw_image_{image_name}", img)
 
     # draw bounding box
     img = cv2.rectangle(img, (x1, y1), (x2, y2), (36,255,12), 2)
@@ -65,7 +67,7 @@ def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), te
     img = cv2.putText(img, id_to_name[int(image_id)], (x2 + 120, y1 + 80), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
     img = cv2.putText(img, 'Image id='+image_id, (x2 + 120, y1 + 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
     # save annotated image
-    cv2.imwrite(f"image_results/annotated_image_{image_name}.jpg", img)
+    cv2.imwrite(f"image_results/annotated_image_{image_name}", img)
 
 
 def rec_image(image, model, signal):
@@ -99,14 +101,15 @@ def rec_image(image, model, signal):
             "prob": confidence
         })
 
-    rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
 
-    if len(rec_result) > 1:
-        filtered_rec_result = filter(lambda x: x['image_id'] != '99', rec_result)
+    rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
+    filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
+
+    if len(filtered_rec_result) > 1:
 
         # filter the result list by bounding box area
         shortlisted_rec_result = []
-        current_area = filtered_rec_result[1]['bbox_area']
+        current_area = filtered_rec_result[0]['bbox_area']
 
         for i in len(filtered_rec_result):
             if (filtered_rec_result[i]['bbox_area'] >= current_area * 0.8) or (filtered_rec_result[i]['image_id'] == '11' and filtered_rec_result[i][bbox_area] >= current_area * 0.6):
@@ -125,7 +128,7 @@ def rec_image(image, model, signal):
 
             else: # signal == 'C'
                 final_rec = shortlisted_rec_result[len(shortlisted_rec_result)//2]
-                
+
     else: # only one result in list
         final_rec = rec_result[0]
 
@@ -136,3 +139,38 @@ def rec_image(image, model, signal):
     draw_bbox(np.array(img),image, final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3], final_id)
 
     return rec_result
+
+def combine_image():
+
+    folder_path = 'image_results/'
+
+    # Use glob to find files with names starting with "annotated_image_"
+    annotated_images = glob.glob(os.path.join(folder_path, 'annotated_image_*'))
+
+    # open all images
+    images = [Image.open(x) for x in annotated_images]
+
+    # number of images in a row
+    num = math.ceil(len(annotated_images) / 2)
+
+    width, height = zip(*(i.size for i in images))
+    final_width = max(width) * num + 50 * num + 50
+    final_height = max(height) * 2 + 50 * 3
+    combinedImg = Image.new('RGB', (final_width, final_height))
+
+    x_offset = 50
+    y_offset = 50
+    x_num = 0 # how many images in current row
+
+    for img in images:
+        combinedImg.paste(img, (x_offset, y_offset))
+        x_offset = x_offset + img.size[0] + 50
+        x_num += 1
+        if x_num == num:
+            x_num = 0
+            x_offset = 50
+            y_offset = 50 + max(height) + 50
+
+    combinedImg.save(os.path.join(folder_path, 'combinedImg.jpeg'))
+
+    return combinedImg

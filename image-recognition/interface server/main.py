@@ -34,5 +34,11 @@ def image_rec():
 
     return jsonify(result)
 
+@app.route('/combine', methods=['GET'])
+def combine():
+    image = combine_image()
+    image.show()
+    return jsonify({"result": "ok"})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5007, debug=True)
