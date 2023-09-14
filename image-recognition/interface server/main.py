@@ -26,7 +26,7 @@ def image_rec():
     file.save(os.path.join('uploads', filename))
 
     # TODO: rec_image function in model.py
-    rec_result = rec_image(filename, model)
+    rec_result = rec_image(filename, model, request.args.get('signal'))
 
     result = {
         "result": rec_result

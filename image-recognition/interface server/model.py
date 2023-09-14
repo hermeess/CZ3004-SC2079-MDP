@@ -68,7 +68,7 @@ def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), te
     cv2.imwrite(f"image_results/annotated_image_{image_name}.jpg", img)
 
 
-def rec_image(image, model):
+def rec_image(image, model, signal):
     
     # load image
     img = Image.open(os.path.join('uploads', image))
@@ -100,12 +100,38 @@ def rec_image(image, model):
         })
 
     rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
-    if rec_result[0]['image_id'] == '99':
-        final_bbox = rec_result[1]['bbox']
-        final_id = rec_result[1]['image_id']
-    else:  
-        final_bbox = rec_result[0]['bbox']
-        final_id = rec_result[0]['image_id']
+
+    if len(rec_result) > 1:
+        filtered_rec_result = filter(lambda x: x['image_id'] != '99', rec_result)
+
+        # filter the result list by bounding box area
+        shortlisted_rec_result = []
+        current_area = filtered_rec_result[1]['bbox_area']
+
+        for i in len(filtered_rec_result):
+            if (filtered_rec_result[i]['bbox_area'] >= current_area * 0.8) or (filtered_rec_result[i]['image_id'] == '11' and filtered_rec_result[i][bbox_area] >= current_area * 0.6):
+                shortlisted_rec_result.append(filtered_rec_result[i])
+
+        # if multiple results remian after filtering by bounding box area
+        if len(shortlisted_rec_result) > 1:
+            # use signal to filter
+            shortlisted_rec_result.sort(key=lambda x:x['bbox'][0])
+
+            if signal == 'L':
+                final_rec = shortlisted_rec_result[0]
+
+            elif signal == 'R':
+                final_rec = shortlisted_rec_result[-1]
+
+            else: # signal == 'C'
+                final_rec = shortlisted_rec_result[len(shortlisted_rec_result)//2]
+                
+    else: # only one result in list
+        final_rec = rec_result[0]
+
+
+    final_bbox = final_rec['bbox']
+    final_id = final_rec['image_id']
 
     draw_bbox(np.array(img),image, final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3], final_id)
 
