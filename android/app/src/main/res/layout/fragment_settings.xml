@@ -43,4 +43,16 @@
         android:textSize="20sp"
         android:backgroundTint="#ff6961"
         android:textColor="#ffffff"/>
+
+    <Button
+        android:id="@+id/scanBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan for Devices" />
+
+    <ListView
+        android:id="@+id/deviceListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>
