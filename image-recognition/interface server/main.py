@@ -26,10 +26,10 @@ def image_rec():
     file.save(os.path.join('uploads', filename))
 
     # TODO: rec_image function in model.py
-    image_id = rec_image(filename, model)
+    rec_result = rec_image(filename, model)
 
     result = {
-        "image_id": image_id
+        "result": rec_result
     }
 
     return jsonify(result)

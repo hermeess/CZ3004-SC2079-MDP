@@ -10,7 +10,7 @@ def load_model():
     model = YOLO('week8.pt')
     return model
 
-def draw_bbox(img, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
+def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
     # convert coordinates to int
     x1 = int(x1)
     x2 = int(x2)
@@ -56,7 +56,7 @@ def draw_bbox(img, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,
 
     # save raw image
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(f"image_results/raw_image_{image_id}.jpg", img)
+    cv2.imwrite(f"image_results/raw_image_{image_name}.jpg", img)
 
     # draw bounding box
     img = cv2.rectangle(img, (x1, y1), (x2, y2), (36,255,12), 2)
@@ -65,7 +65,7 @@ def draw_bbox(img, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,
     img = cv2.putText(img, id_to_name[int(image_id)], (x2 + 120, y1 + 80), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
     img = cv2.putText(img, 'Image id='+image_id, (x2 + 120, y1 + 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
     # save annotated image
-    cv2.imwrite(f"image_results/annotated_image_{image_id}.jpg", img)
+    cv2.imwrite(f"image_results/annotated_image_{image_name}.jpg", img)
 
 
 def rec_image(image, model):
@@ -75,19 +75,38 @@ def rec_image(image, model):
     results = model.predict(img)
     result = results[0]
 
-    rec_result = 'NA'
+    rec_result = []
+
+    if len(result.boxes) == 0:
+        return rec_result
 
     print("-----Recognize results-----")
-
     for box in result.boxes:
         image_id = result.names[box.cls[0].item()]
         bbox = box.xyxy[0].tolist()
+        bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
         confidence = round(box.conf[0].item(), 3)
+
         print("Image ID:", image_id)
         print("Bounding box coordinates:", bbox)
+        print("Bounding box area: ", bbox_area)
         print("Probability:", confidence)
-        draw_bbox(np.array(img), bbox[0], bbox[1], bbox[2], bbox[3], image_id)
-        rec_result = image_id
+        
+        rec_result.append({
+            "image_id": image_id,
+            "bbox": bbox,
+            "bbox_area": bbox_area,
+            "prob": confidence
+        })
+
+    rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
+    if rec_result[0]['image_id'] == '99':
+        final_bbox = rec_result[1]['bbox']
+        final_id = rec_result[1]['image_id']
+    else:  
+        final_bbox = rec_result[0]['bbox']
+        final_id = rec_result[0]['image_id']
+
+    draw_bbox(np.array(img),image, final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3], final_id)
 
     return rec_result
-        
