@@ -24,10 +24,7 @@ class RaspberryPi:
             self.proc_recv_stm32.start()
             self.logger.info("Child Processes started")
             
-            self.stm_link.send("12345")
-            self.stm_link.send("54321")
-            self.stm_link.send("abcd")
-            self.stm_link.send("defg")
+            self.stm_link.send("FR010")
 
         except KeyboardInterrupt:
             self.stop()
