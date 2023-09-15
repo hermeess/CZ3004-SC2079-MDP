@@ -23,6 +23,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -66,6 +67,13 @@ class ImageInfo {
     public void setDirection(String direction) {
         this.direction = direction;
     }
+}
+
+class Obstacle{
+    private int id;
+    private int x;
+    private int y;
+    private int d;
 }
 
 public class MapFragment extends Fragment {
@@ -199,7 +207,11 @@ public class MapFragment extends Fragment {
             @Override
             public void onClick(View v){
                 // Call sendObstacleToRpi here
-                sendObstacleToRpi();
+                try {
+                    sendObstacleToRpi();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -317,8 +329,8 @@ public class MapFragment extends Fragment {
             imageView.setImageResource(drawableResource);
 
             // Set layout parameters for the ImageView
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
-            params.setMargins(20, 0, 20, 0);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+            params.setMargins(10, 0, 10, 0);
             imageView.setLayoutParams(params);
 
             // Add the OnLongClickListener to start dragging
@@ -381,8 +393,8 @@ public class MapFragment extends Fragment {
                             setGridCellBorderColor("None");
                             // If the drop position is not valid within the grid,
                             // Set appropriate layout parameters for the image
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
-                            params.setMargins(20, 0, 20, 0);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+                            params.setMargins(10, 0, 10, 0);
                             draggedImage.setLayoutParams(params);
                             draggedImage.setPadding(0,0,0,0);
 
@@ -540,7 +552,7 @@ public class MapFragment extends Fragment {
 
                         // Add the image to the specified position in the grid
                         targetGrid.addView(draggedImage);
-                        draggedImage.setPadding(0,10,0,10);
+                        draggedImage.setPadding(0,5,0,5);
                         draggedImage.setVisibility(View.VISIBLE);
 
                         // Update the image's row and column in the map
@@ -578,8 +590,8 @@ public class MapFragment extends Fragment {
                     } else if (v != targetGrid) {
                         // If the drop position is not valid within the grid,
                         // set appropriate layout parameters for the image
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
-                        params.setMargins(20, 0, 20, 0);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+                        params.setMargins(10, 0, 10, 0);
                         draggedImage.setLayoutParams(params);
 
                         // Append the image to the end of the LinearLayout
@@ -761,10 +773,10 @@ public class MapFragment extends Fragment {
                 break;
         }
         JSONObject item = new JSONObject();
-        item.put("obstacle_id", obstacle_id);
+        item.put("id", obstacle_id);
         item.put("x",imageInfo.getCol()-1);
         item.put("y", imageInfo.getRow()-1);
-        item.put("dir", dirs);
+        item.put("d", dirs);
         // Add obstacleInfo to hashmap
         obstacleMap.put(imageInfoTag, item);
     }
@@ -782,8 +794,12 @@ public class MapFragment extends Fragment {
          }
      }
     */
-    private void sendObstacleToRpi(){
-        JSONObject json = new JSONObject(obstacleMap);
+    private void sendObstacleToRpi() throws JSONException {
+        Log.d("Obstacle map", obstacleMap.toString());
+        ArrayList<JSONObject> list = new ArrayList<JSONObject>(obstacleMap.values());
+        Log.d("ArrayList", list.toString());
+        JSONObject json = new JSONObject();
+        json.put("obstacle", list);
         Log.d("Obstacle json", json.toString());
     }
 }

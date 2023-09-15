@@ -294,6 +294,7 @@ public class SettingsFragment extends Fragment {
                                     android.Manifest.permission.ACCESS_FINE_LOCATION
                             },
                             REQUEST_BLUETOOTH_PERMISSIONS);
+                    bluetoothAdapter.startDiscovery();
                 }
             }
         }
