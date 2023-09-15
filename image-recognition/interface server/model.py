@@ -9,7 +9,7 @@ import math
 
 def load_model():
     # model = torch.hub.load('./', 'custom', path='week8.pt', source='local')
-    model = YOLO('week8.pt')
+    model = YOLO('../weights/week8.pt')
     return model
 
 def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
