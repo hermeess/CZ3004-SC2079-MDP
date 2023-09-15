@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Add a border around the grid -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:color="@color/grid_border_color"
+                android:width="@dimen/grid_border_width" />
+        </shape>
+    </item>
+    <!-- Add a background color for the grid -->
+    <item android:top="@dimen/grid_border_width" android:left="@dimen/grid_border_width" android:right="@dimen/grid_border_width"
+        android:bottom="@dimen/grid_border_width">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+</layer-list>
