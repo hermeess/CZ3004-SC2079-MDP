@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editObstacleId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Obstacle Id" />
+
+    <EditText
+        android:id="@+id/editRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editObstacleId"
+        android:layout_marginTop="16dp"
+        android:hint="Row" />
+
+    <EditText
+        android:id="@+id/editCol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editRow"
+        android:layout_marginTop="16dp"
+        android:hint="Col" />
+
+    <EditText
+        android:id="@+id/editDirection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editCol"
+        android:layout_marginTop="16dp"
+        android:hint="Direction" />
+
+    <Button
+        android:id="@+id/buttonCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editDirection"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentStart="true"
+        android:text="Cancel" />
+
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editDirection"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentEnd="true"
+        android:text="Submit" />
+
+</RelativeLayout>
