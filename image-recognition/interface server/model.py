@@ -105,13 +105,15 @@ def rec_image(image, model, signal):
     rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
     filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
 
+    final_rec = {}
+
     if len(filtered_rec_result) > 1:
 
         # filter the result list by bounding box area
         shortlisted_rec_result = []
         current_area = filtered_rec_result[0]['bbox_area']
 
-        for i in len(filtered_rec_result):
+        for i in range(len(filtered_rec_result)):
             if (filtered_rec_result[i]['bbox_area'] >= current_area * 0.8) or (filtered_rec_result[i]['image_id'] == '11' and filtered_rec_result[i][bbox_area] >= current_area * 0.6):
                 shortlisted_rec_result.append(filtered_rec_result[i])
 
@@ -128,6 +130,8 @@ def rec_image(image, model, signal):
 
             else: # signal == 'C'
                 final_rec = shortlisted_rec_result[len(shortlisted_rec_result)//2]
+        else:
+            final_rec = shortlisted_rec_result[0]
 
     else: # only one result in list
         final_rec = rec_result[0]
