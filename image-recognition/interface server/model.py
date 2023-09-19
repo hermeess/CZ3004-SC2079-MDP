@@ -1,6 +1,5 @@
 from PIL import Image
 from ultralytics import YOLO
-import torch
 import os
 import cv2
 import numpy as np
@@ -9,7 +8,7 @@ import math
 
 def load_model():
     # model = torch.hub.load('./', 'custom', path='week8.pt', source='local')
-    model = YOLO('../weights/week8.pt')
+    model = YOLO('../weights/week9.pt')
     return model
 
 def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
@@ -143,6 +142,43 @@ def rec_image(image, model, signal):
     draw_bbox(np.array(img),image, final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3], final_id)
 
     return rec_result
+
+def rec_image_week9(image, model, signal):
+    
+    # load image
+    img = Image.open(os.path.join('uploads', image))
+    results = model.predict(img)
+    result = results[0]
+
+    rec_result = []
+
+    if len(result.boxes) == 0:
+        return rec_result
+
+    print("-----Recognize results-----")
+    for box in result.boxes:
+        image_id = result.names[box.cls[0].item()][2:]
+        bbox = box.xyxy[0].tolist()
+        bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+        confidence = round(box.conf[0].item(), 3)
+
+        print("Image ID:", image_id)
+        print("Bounding box coordinates:", bbox)
+        print("Bounding box area: ", bbox_area)
+        print("Probability:", confidence)
+        
+        rec_result.append({
+            "image_id": image_id,
+            "bbox": bbox,
+            "bbox_area": bbox_area,
+            "prob": confidence
+        })
+
+    rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
+    filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
+    # by right there should be only one result after filtering out bulleyes
+
+    return filtered_rec_result[0]
 
 def combine_image():
 
