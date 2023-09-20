@@ -17,8 +17,20 @@ def get_status():
 
 @app.route('/image', methods=['POST'])
 def image_rec():
+    '''
+     Filename format: "<timestamp>_<obstacle_id>_<signal>.jpg"
+    '''
     file = request.files['file']
     filename = file.filename
+
+    # Split the string by underscore
+    parts = filename.split("_")
+
+    # Extract the values
+    obstacle_id = parts[1]  # <obstacle_id>
+    signal = parts[2].split(".")[0]  # <signal>
+
+    filename = parts[0] # only leave the timestamp for filename
 
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
@@ -26,10 +38,11 @@ def image_rec():
     file.save(os.path.join('uploads', filename))
 
     # TODO: rec_image function in model.py
-    rec_result = rec_image(filename, model, request.args.get('signal'))
+    rec_result = rec_image(filename, model, signal)
 
     result = {
-        "result": rec_result
+        "image_id": rec_result['image_id'],
+        "obstacle_id": obstacle_id
     }
 
     return jsonify(result)

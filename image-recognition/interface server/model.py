@@ -158,23 +158,24 @@ def rec_image_week9(image, model, signal):
     print("-----Recognize results-----")
     for box in result.boxes:
         image_id = result.names[box.cls[0].item()][2:]
-        bbox = box.xyxy[0].tolist()
-        bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+        # bbox = box.xyxy[0].tolist()
+        # bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
         confidence = round(box.conf[0].item(), 3)
 
         print("Image ID:", image_id)
-        print("Bounding box coordinates:", bbox)
-        print("Bounding box area: ", bbox_area)
+        # print("Bounding box coordinates:", bbox)
+        # print("Bounding box area: ", bbox_area)
         print("Probability:", confidence)
         
         rec_result.append({
             "image_id": image_id,
-            "bbox": bbox,
-            "bbox_area": bbox_area,
+            # "bbox": bbox,
+            # "bbox_area": bbox_area,
             "prob": confidence
         })
 
-    rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
+    rec_result.sort(key=lambda x: x['prob'], reverse=True) # sort by confidence
+
     filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
     # by right there should be only one result after filtering out bulleyes
 
