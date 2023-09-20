@@ -41,8 +41,8 @@ def image_rec():
     rec_result = rec_image(filename, model, signal)
 
     result = {
-        "image_id": rec_result['image_id'],
-        "obstacle_id": obstacle_id
+        "image_id": int(rec_result['image_id']),
+        "obstacle_id": int(obstacle_id)
     }
 
     return jsonify(result)
