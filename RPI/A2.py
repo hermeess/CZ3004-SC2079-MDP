@@ -47,7 +47,8 @@ class RaspberryPi:
         try:
             ### Start up initialization ###
             self.snap_and_rec("1_C")
-
+            while True:
+                pass
         except KeyboardInterrupt:
             self.stop()
 
