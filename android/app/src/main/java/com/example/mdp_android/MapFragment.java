@@ -141,13 +141,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true); // Retain the fragment instance
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
 
     /*
    Note:
@@ -978,12 +976,13 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     //this is to return currObstacle if there is one in the current grid cell
     public String removeObstacle(int row, int col){
         String isOccupiedKey = "";
+        Log.d("Obstacle map delete", obstacleMap.toString());
         for (HashMap.Entry<String, JSONObject> entry : obstacleMap.entrySet()) {
             String key = entry.getKey();
             JSONObject obstacleData = entry.getValue();
             // Extract values from the JSONObject
-            int x = obstacleData.optInt("x", -1) + 1;
-            int y = obstacleData.optInt("y", -1) + 1;
+            int x = obstacleData.optInt("x", -1)+1;
+            int y = obstacleData.optInt("y", -1)+1;
             if (x == row && col == col) {
                 isOccupiedKey = key;
                 break;
