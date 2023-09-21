@@ -976,7 +976,6 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     //this is to return currObstacle if there is one in the current grid cell
     public String removeObstacle(int row, int col){
         String isOccupiedKey = "";
-        Log.d("Obstacle map delete", obstacleMap.toString());
         for (HashMap.Entry<String, JSONObject> entry : obstacleMap.entrySet()) {
             String key = entry.getKey();
             JSONObject obstacleData = entry.getValue();
