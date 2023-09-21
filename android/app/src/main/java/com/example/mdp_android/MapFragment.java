@@ -141,13 +141,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true); // Retain the fragment instance
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
 
     /*
    Note:
@@ -167,7 +165,6 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         LinearLayout linearLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
         GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
 
-        Log.d("OnCreate view", "Creating view");
 
         // Find the buttons by their IDs
         Button buttonLeft = rootView.findViewById(R.id.buttonLeft);
