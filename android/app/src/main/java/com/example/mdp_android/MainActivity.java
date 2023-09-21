@@ -25,19 +25,18 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         SettingsFragment settingsFragment = new SettingsFragment();
+        MapFragment mapFragment = new MapFragment();
         settingsFragment.setPermissionCallback(this);
-        replaceFragment(new MapFragment());
+        replaceFragment(mapFragment);
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             int itemId = item.getItemId(); // Get the selected item's ID
 
-             if (itemId == R.id.message) {
-                replaceFragment(new MessageFragment());
-            } else if (itemId == R.id.map) {
-                replaceFragment(new MapFragment());
+            if (itemId == R.id.map) {
+                replaceFragment(mapFragment);
             } else if (itemId == R.id.settings) {
-                replaceFragment(new SettingsFragment());
+                replaceFragment(settingsFragment);
             }
 
             return true;
