@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background shape -->
+    <item android:drawable="@android:color/transparent" />
+    <!-- Arrow shape -->
+    <item
+        android:width="20dp"
+        android:height="20dp"
+        android:drawable="@drawable/baseline_chevron_right_20" />
+</layer-list>
