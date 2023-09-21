@@ -1,13 +1,20 @@
 package com.example.mdp_android;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-
-import androidx.annotation.ColorInt;
-import androidx.fragment.app.Fragment;
-
+import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -16,19 +23,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.nio.charset.Charset;
+import java.util.UUID;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import com.example.mdp_android.ObstacleDialogListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -115,6 +136,38 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     private final HashMap<String, JSONObject> obstacleMap = new HashMap<>(); // Used to store the obstacle to send to bluetooth.
 
     private final int[] rowArr = new int[21]; // Used to store the row tick labels
+    private static final String TAG = "MapFragment";
+
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    ImageButton forwardBtn;
+    ImageButton leftBtn;
+    ImageButton backwardBtn;
+    ImageButton rightBtn;
+    Button waypoint;
+    Button startpoint;
+    Button ftpBtn;
+    Button explorationBtn;
+    Button manualBtn;
+    Switch tiltBtn;
+    ToggleButton autoBtn;
+    TextView incomingText;
+    TextView robotStatus;
+    TextView connectionStatusBox;
+    TextView md5ExplorationText;
+    TextView md5ObstacleText;
+    static String connectedDevice;
+    boolean connectedState;
+    boolean currentActivity;
+    BluetoothDevice myBTConnectionDevice;
+    static Context context;
+    MazeView myMaze;
+    boolean autoUpdate;
+    boolean tiltNavi;
+
+
+    //UUID
+    private static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     public MapFragment() {
         // Required empty public constructor
@@ -177,6 +230,13 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         Button buttonAdd = rootView.findViewById(R.id.addObstacles);
         Button buttonStart = rootView.findViewById(R.id.startButton);
 
+        connectedDevice = null;
+        connectedState = false;
+        currentActivity = true;
+        connectionStatusBox = rootView.findViewById(R.id.connectionStatus);
+        robotStatus = rootView.findViewById(R.id.robotStatus);
+        incomingText = rootView.findViewById(R.id.statusHeader);
+        incomingText.setMovementMethod(new ScrollingMovementMethod());
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -444,6 +504,18 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
 
         return rootView;
     }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Other initialization, if needed
+        //REGISTER BROADCAST RECEIVER FOR INCOMING MSG
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(btConnectionReceiver, new IntentFilter("btConnectionStatus"));
+
+        // REGISTER BROADCAST RECEIVER FOR INCOMING MSG
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(incomingMsgReceiver, new IntentFilter("IncomingMsg"));
+    }
+
     // Function to show a dialog for selecting a direction
     private void showDirectionSelectionDialog() {
         // Create an array of direction options
@@ -464,6 +536,36 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             }
         });
         builder.show();
+    }
+    public String constructObstacleJson(ImageInfo imageInfo, String selectedImageViewTag) {
+        try {
+            JSONObject mainObject = new JSONObject();
+            JSONObject valueObject = new JSONObject();
+            JSONArray obstaclesArray = new JSONArray();
+            JSONObject obstacleObject = new JSONObject();
+
+            // Subtracting 1 from the row and column for 0-based index
+            obstacleObject.put("x", imageInfo.getCol() - 1); // Assuming Col is X
+            obstacleObject.put("y", imageInfo.getRow() - 1); // Assuming Row is Y
+
+            // Extract numeric portion from selectedImageViewTag and parse it
+            String numericPart = selectedImageViewTag.replaceAll("[^\\d]", "");
+            int obstacleId = Integer.parseInt(numericPart);
+
+            obstacleObject.put("id", obstacleId);
+            obstacleObject.put("d", imageInfo.getDirection());
+
+            obstaclesArray.put(obstacleObject);
+            valueObject.put("obstacles", obstaclesArray);
+            mainObject.put("cat", "obstacles");
+            mainObject.put("value", valueObject);
+
+            return mainObject.toString();
+
+        } catch (JSONException | NumberFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // Function to set the border color of the selected grid cell
@@ -495,11 +597,15 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             ImageInfo imageInfo = imageInfoMap.get(selectedImageViewTag);
             if (imageInfo != null) {
                 imageInfo.setDirection(direction);
-
+                String obstacleJson = constructObstacleJson(imageInfo, selectedImageViewTag);
+                if (obstacleJson != null) {
+                    BluetoothChat.writeMsg(obstacleJson.getBytes(Charset.defaultCharset()));
+                }
                 //Send the data to bluetooth here, this is the one with the updated direction + x,y
                 Log.d("ImageInfo", imageInfo.toString());
                 //>>Bluetooth>>sendIMageInfoToBluetooth(imageInfo)
                 //send to the tool
+
                 //Obstacle ID = selectedImageViewTag, X, Y, Col can just follow log.d below to how to get.
                 //"Obstacle, ID:, X:,Y:, DIR:"
             }
@@ -524,6 +630,23 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                     throw new RuntimeException(e);
                 }
             }
+        }
+    }
+    public String constructUpdatedImageJson(ImageInfo imageInfo, String draggedImageTag, boolean isRobot) {
+        try {
+            JSONObject mainObject = new JSONObject();
+
+            mainObject.put("tag", draggedImageTag);
+            mainObject.put("x", imageInfo.getCol() - 1); // Adjusting for 0-based index
+            mainObject.put("y", imageInfo.getRow() - 1); // Adjusting for 0-based index
+            mainObject.put("direction", imageInfo.getDirection());
+            mainObject.put("isRobot", isRobot); // Boolean field indicating if it's a robot
+
+            return mainObject.toString();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -584,6 +707,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                                     " Row: " + imageInfo.getRow() +
                                     " Column: " + imageInfo.getCol() +
                                     " Direction: " + imageInfo.getDirection());
+                            boolean isRobotImage = draggedImageTag.equals("robot");
+                            String updatedImageJson = constructUpdatedImageJson(imageInfo, draggedImageTag, isRobotImage);
+                            if (updatedImageJson != null) {
+                                BluetoothChat.writeMsg(updatedImageJson.getBytes(Charset.defaultCharset()));
+                            }
                             // Adding the obstacle to obstacle map;
                             try {
                                 if(!draggedImageTag.equals("robot")){
@@ -652,6 +780,25 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     // NOTE: When receiving from RPi & algo team need to +1 to row and col.
     // Likewise if sending to RPi & algo, -1 to row and col.
     // Double check what you will be receive for the updateRobot portion from RPi side.
+
+    private String constructRobotJson(int newRow, int newCol, String direction) {
+        try {
+            JSONObject mainObject = new JSONObject();
+
+            mainObject.put("tag", "robot");
+            mainObject.put("x", newCol - 1); // Adjusting for 0-based index
+            mainObject.put("y", newRow - 1); // Adjusting for 0-based index
+            mainObject.put("direction", direction);
+            mainObject.put("isRobot", true);
+
+            return mainObject.toString();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void updateRobot(int newRow, int newCol, int dirs, String action) {
         // Find the robot's ImageView by its tag, robot's tag is hardcoded to be obstacle_0
         ImageView robotImageView = rootView.findViewWithTag("robot");
@@ -694,6 +841,10 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         }
         // If action is by button click.
         if(action.equals("MOVE")){
+            String robotJson = constructRobotJson(newRow, newCol, direction);
+            if (robotJson != null) {
+                BluetoothChat.writeMsg(robotJson.getBytes(Charset.defaultCharset()));
+            }
             //>> bluetooth Send the details to RPi for robot to move;
             //need to -1 from row and col when sending to RPI;
         }
@@ -989,7 +1140,132 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         }
         return isOccupiedKey;
     }
+    BroadcastReceiver incomingMsgReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String msg = intent.getStringExtra("receivingMsg");
 
+            // Update the UI
+            incomingText.setText(msg);
+
+            // Process the JSON message
+            processJsonMessage(msg);
+        }
+    };
+
+
+    //BROADCAST RECEIVER FOR BLUETOOTH CONNECTION STATUS
+    BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d(TAG, "Receiving btConnectionStatus Msg!!!");
+
+            String connectionStatus = intent.getStringExtra("ConnectionStatus");
+            myBTConnectionDevice = intent.getParcelableExtra("Device");
+            //myBTConnectionDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            //DISCONNECTED FROM BLUETOOTH CHAT
+            if (connectionStatus.equals("disconnect")) {
+
+                Log.d("SettingsFragment:", "Device Disconnected");
+                connectedDevice = null;
+                connectedState = false;
+                connectionStatusBox.setText(R.string.btStatusOffline);
+
+                if (currentActivity) {
+
+                    //RECONNECT DIALOG MSG
+                    AlertDialog alertDialog = new AlertDialog.Builder(requireActivity()).create();
+
+                    alertDialog.setTitle("BLUETOOTH DISCONNECTED");
+                    alertDialog.setMessage("Connection with device: '" + myBTConnectionDevice.getName() + "' has ended. Do you want to reconnect?");
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    //START BT CONNECTION SERVICE
+                                    Intent connectIntent = new Intent(requireActivity(), BluetoothConnectionService.class);
+
+                                    connectIntent.putExtra("serviceType", "connect");
+                                    connectIntent.putExtra("device", myBTConnectionDevice);
+                                    connectIntent.putExtra("id", myUUID);
+                                    requireActivity().startService(connectIntent);
+
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+
+                }
+            }
+            //SUCCESSFULLY CONNECTED TO BLUETOOTH DEVICE
+            else if (connectionStatus.equals("connect")) {
+
+                if (myBTConnectionDevice != null) {
+                    connectedDevice = myBTConnectionDevice.getName();
+                    connectedState = true;
+                    Log.d("MainActivity:", "Device Connected " + connectedState);
+                    connectionStatusBox.setText(connectedDevice);
+                    Toast.makeText(requireActivity(), "Connection Established: " + myBTConnectionDevice.getName(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("MainActivity:", "myBTConnectionDevice is null");
+                }
+            }
+
+
+            //BLUETOOTH CONNECTION FAILED
+            else if (connectionStatus.equals("connectionFail")) {
+                Toast.makeText(requireActivity(), "Connection Failed: " + myBTConnectionDevice.getName(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+        }
+    };
+
+    private String[] delimiterMsg(String msg, String delimiter) {
+
+        return (msg.toLowerCase()).split(delimiter);
+    }
+
+    public void processJsonMessage(String jsonMsg) {
+        try {
+            JSONObject mainObject = new JSONObject(jsonMsg);
+            String category = mainObject.getString("cat");
+            JSONObject valueObj = mainObject.getJSONObject("value");
+
+            switch (category) {
+                case "location":
+                    int x = valueObj.getInt("x");
+                    int y = valueObj.getInt("y");
+                    int d = valueObj.getInt("d");
+
+                    // I'm assuming you want to use the 'x' and 'y' values as newCol and newRow respectively.
+                    // Adjust if needed.
+                    updateRobot(y, x, d, "123"); // Hardcoding "MOVE" as action, change as needed.
+                    break;
+
+                case "image-rec":
+                    String image_id = valueObj.getString("image_id");
+                    String obstacle_id = valueObj.getString("obstacle_id");
+                    updateTarget(image_id, obstacle_id);
+                    break;
+
+                // Add other cases as needed
+                default:
+                    Log.w("ProcessJson", "Unknown category: " + category);
+                    break;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("ProcessJson", "Error processing JSON message", e);
+        }
+    }
 
     //>>BLuetooth receive from RPi
     /*

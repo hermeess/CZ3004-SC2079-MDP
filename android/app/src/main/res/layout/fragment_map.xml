@@ -246,7 +246,7 @@
                 android:textSize="6sp"
                 android:textColor="#000000" />
             <TextView
-                android:id="@+id/statusMessage"
+                android:id="@+id/robotStatus"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -268,7 +268,7 @@
                 android:textSize="6sp"
                 android:textColor="#000000" />
             <TextView
-                android:id="@+id/bluetoothStatus"
+                android:id="@+id/connectionStatus"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

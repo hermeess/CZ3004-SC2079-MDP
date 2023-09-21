@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-feature android:name="android.hardware.bluetooth" />
+
+
 
 
     <application
@@ -32,6 +36,7 @@
                 <action android:name="android.bluetooth.device.action.FOUND" />
             </intent-filter>
         </receiver>
+        <service android:name=".BluetoothConnectionService" />
 
         <activity
             android:name=".MainActivity"
@@ -42,6 +47,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SettingsFragment" />
+        <activity android:name=".Connect" />
+
+
     </application>
 
 </manifest>

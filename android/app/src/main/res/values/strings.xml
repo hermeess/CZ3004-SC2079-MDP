@@ -1,5 +1,26 @@
 <resources>
     <string name="app_name">MDP_Android</string>
+    <string name="bluetooth_status">BT Connection: </string>
+    <string name="bluetooth_off">Bluetooth Off</string>
+    <string name="manual">Manual</string>
+    <string name="Robot_Status">Robot Status:</string>
+    <string name="Robot_Idle">Stop</string>
+    <string name="Robot_Moving">Moving</string>
+    <string name="Exploration">Exploration</string>
+    <string name="FastestPath">Fastest Path</string>
+    <string name="btStatusOffline">NOT CONNECTED</string>
+    <string name="Explore">Explore</string>
+    <string name="Start_stp">Shortest Path</string>
+    <string name="F1">F1</string>
+    <string name="F2">F2</string>
+    <string name="Change_f1">Change F1</string>
+    <string name="change_f2">Change F2</string>
+    <string name="Reconfigure">Reconfigure</string>
+    <string name="searchDevice">Searching Devices…</string>
+    <string name="searchDone">Device Found:</string>
+    <string name="Save">Save</string>
+    <string name="Clear">Clear</string>
+    <string name="Retrieve">Retrieve</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

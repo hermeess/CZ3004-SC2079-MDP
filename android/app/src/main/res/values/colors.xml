@@ -4,4 +4,13 @@
     <color name="white">#FFFFFFFF</color>
     <color name="grid_border_color">#000000</color>
     <color name="grid_cell_color">#CCCCCC</color>
+    <color name="colorPrimary">#3f3f3f</color>
+    <color name="colorPrimaryDark">#2a2a2a</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="lightgrey">#939393</color>
+    <color name="unexplored">#888888</color>
+    <color name="path">#FFDAB9</color>
+    <color name="obstacle">#7F0000</color>
+    <color name="mazeborder">#000080</color>
+    <color name="offwhite">#F9F1f1</color>
 </resources>

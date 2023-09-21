@@ -1,553 +1,887 @@
 package com.example.mdp_android;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.widget.Toast;
-import android.os.Build;
-import android.content.BroadcastReceiver;
-import android.widget.AdapterView;
-import android.content.IntentFilter;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.os.ParcelUuid;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
+import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.nio.charset.Charset;
 import java.util.UUID;
-import androidx.core.content.ContextCompat;
-import androidx.core.app.ActivityCompat;
+
+public class SettingsFragment extends AppCompatActivity implements SensorEventListener {
+
+    private static final String TAG = "SettingsFragment";
+
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    ImageButton forwardBtn;
+    ImageButton leftBtn;
+    ImageButton backwardBtn;
+    ImageButton rightBtn;
+    Button waypoint;
+    Button startpoint;
+    Button ftpBtn;
+    Button explorationBtn;
+    Button manualBtn;
+    Switch tiltBtn;
+    ToggleButton autoBtn;
+    TextView incomingText;
+    TextView robotStatus;
+    TextView connectionStatusBox;
+    TextView md5ExplorationText;
+    TextView md5ObstacleText;
+    static String connectedDevice;
+    boolean connectedState;
+    boolean currentActivity;
+    BluetoothDevice myBTConnectionDevice;
+    static Context context;
+    MazeView myMaze;
+    boolean autoUpdate;
+    boolean tiltNavi;
 
 
-public class SettingsFragment extends Fragment {
+    //UUID
+    private static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    private String mParam1;
-    private String mParam2;
-
-    private BluetoothAdapter bluetoothAdapter;
-    private BluetoothDevice connectedDevice;
-    private BluetoothSocket bluetoothSocket;
-    private PermissionCallback permissionCallback;
-
-    private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
-
-    private void showToast(String message) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
-    }
-    public interface PermissionCallback {
-        void onBluetoothPermissionGranted();
-    }
-
-    public void setPermissionCallback(PermissionCallback callback) {
-        this.permissionCallback = callback;
-    }
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    private ArrayList<BluetoothDevice> discoveredDevices = new ArrayList<>();
-    private View rootView;
-    public void openDeviceListDialog() {
-        showDeviceListDialog();
-    }
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        Log.d(" SettigsFragment:", "onCreate");
+
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        setContentView(R.layout.fragment_settings);
+        myMaze = findViewById(R.id.mapView);
+
+        connectedDevice = null;
+        connectedState = false;
+        currentActivity = true;
+        autoUpdate = true;
+        tiltNavi = false;
+        forwardBtn = findViewById(R.id.forwardBtn);
+        leftBtn = findViewById(R.id.leftBtn);
+        rightBtn = findViewById(R.id.rightBtn);
+        backwardBtn = findViewById(R.id.backwardBtn);
+        connectionStatusBox = findViewById(R.id.connectionStatus);
+        waypoint = findViewById(R.id.wpBtn);
+        startpoint = findViewById(R.id.spBtn);
+        explorationBtn = findViewById(R.id.explorationBtn);
+        ftpBtn = findViewById(R.id.ftpBtn);
+        robotStatus = findViewById(R.id.robotStatus);
+        manualBtn = findViewById(R.id.manualBtn);
+        autoBtn = findViewById(R.id.autoBtn);
+        tiltBtn = findViewById(R.id.tiltSwitch);
+        incomingText = findViewById(R.id.incomingText);
+        md5ExplorationText = findViewById(R.id.md5ExplorationText);
+        md5ObstacleText = findViewById(R.id.md5ObstacleText);
+
+        //SET ONCLICKLISTENER FOR NAVIGATION BUTTON
+        onClickNavigationForward();
+        onClickNavigationBackward();
+        onClickNavigationRight();
+        onClickNavigationLeft();
+        onClickSetWaypoint();
+        onClickSetStartPoint();
+        onClickStartSp();
+        onClickStartExploration();
+        onClickManualUpdate();
+        onClickAutoUpdate();
+        onClickTiltSwitch();
+
+        //MAKE TEXTFIELD SCROLLABLE
+        incomingText.setMovementMethod(new ScrollingMovementMethod());
+        md5ObstacleText.setMovementMethod(new ScrollingMovementMethod());
+        md5ExplorationText.setMovementMethod(new ScrollingMovementMethod());
+
+        //DECLARING SENSOR MANAGER AND SENSOR TYPE
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        //REGISTER TILT MOTION SENSOR
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+
+        //REGISTER BROADCAST RECEIVER FOR INCOMING MSG
+        LocalBroadcastManager.getInstance(this).registerReceiver(btConnectionReceiver, new IntentFilter("btConnectionStatus"));
+
+        //REGISTER BROADCAST RECEIVER FOR IMCOMING MSG
+        LocalBroadcastManager.getInstance(this).registerReceiver(incomingMsgReceiver, new IntentFilter("IncomingMsg"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // Log or put a breakpoint here to check if it's being called
+        Log.d("SettingsFragment", "Back pressed");
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    //RESUME ACTIVITY
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        currentActivity = true;
+
+        //REGISTER TILT MOTION SENSOR
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        Log.d(" MainAcitvity:", "OnResume:" + connectedState);
+
+        //CHECK FOR EXISTING CONNECTION
+        if (connectedState) {
+            Log.d(" MainAcitvity:", "OnResume1");
+
+            //SET TEXTFIELD TO DEVICE NAME
+            connectionStatusBox.setText(connectedDevice);
+        } else {
+            Log.d(" MainAcitvity:", "OnResume2");
+
+            //SET TEXTFIELD TO NOT CONNECTED
+            connectionStatusBox.setText(R.string.btStatusOffline);
         }
-    }
 
-    private static final int REQUEST_ENABLE_BT = 1;
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        Log.d("SettingsFragment", "onCreateView called");
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-        ListView deviceListView = rootView.findViewById(R.id.deviceListView);
-        ListView listView = view.findViewById(R.id.deviceListView);
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        permissionCallback = mainActivity;
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        requireActivity().registerReceiver(mReceiver, filter);
-
-        IntentFilter bondStateFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        requireActivity().registerReceiver(mBondStateReceiver, bondStateFilter);
-
-        Button connectButton = rootView.findViewById(R.id.connectBtn);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // Cancel discovery because it's costly and we're about to connect
-                bluetoothAdapter.cancelDiscovery();
-
-                // Get the device MAC address, which is the last 17 chars in the View
-                String info = ((TextView) view).getText().toString();
-                String address = info.substring(info.length() - 17);
-
-                Log.d("BondingProcess", "MAC address: " + address);
-
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-
-                // Check and log the bond state before attempting to create a bond
-                Log.d("BondingProcess", "Current bond state: " + device.getBondState());
-
-                // Initiate bonding
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    boolean bondInitiated = device.createBond();
-                    Log.d("BondingProcess", "Bond initiated: " + bondInitiated);
-                }
-
-                // Now proceed to connect to the device
-                // Your existing connection code here
-            }
-
-        });
-
-        connectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Button Click", "Connect to robot button clicked");
-
-                if (!bluetoothAdapter.isEnabled()) {
-                    // Bluetooth is not enabled, prompt the user to enable it
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        // For Android 12 and above
-                        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH)
-                                != PackageManager.PERMISSION_GRANTED
-                                || ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_ADMIN)
-                                != PackageManager.PERMISSION_GRANTED
-                                || ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT)
-                                != PackageManager.PERMISSION_GRANTED
-                                || ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(requireActivity(),
-                                    new String[]{
-                                            android.Manifest.permission.BLUETOOTH,
-                                            android.Manifest.permission.BLUETOOTH_ADMIN,
-                                            android.Manifest.permission.BLUETOOTH_CONNECT,
-                                            android.Manifest.permission.ACCESS_FINE_LOCATION
-                                    },
-                                    REQUEST_BLUETOOTH_PERMISSIONS);
-                        } else {
-                            // Permission already granted, proceed
-                            if (permissionCallback != null) {
-                                onBluetoothPermissionGranted();
-                            }
-                        }
-                    } else {
-                        // For Android 11 and below
-                        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH)
-                                != PackageManager.PERMISSION_GRANTED
-                                || ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_ADMIN)
-                                != PackageManager.PERMISSION_GRANTED
-                                || ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(requireActivity(),
-                                    new String[]{
-                                            android.Manifest.permission.BLUETOOTH,
-                                            android.Manifest.permission.BLUETOOTH_ADMIN,
-                                            android.Manifest.permission.ACCESS_FINE_LOCATION
-                                    },
-                                    REQUEST_BLUETOOTH_PERMISSIONS);
-                        } else {
-                            // Permission already granted, proceed
-                            if (permissionCallback != null) {
-                                onBluetoothPermissionGranted();
-                            }
-                        }
-                    }
-
-
-
-                }
-            }
-        });
-        Button scanButton = rootView.findViewById(R.id.scanBtn);
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Start Bluetooth device discovery
-                startDeviceDiscovery();
-            }
-        });
-        Button disconnectButton = rootView.findViewById(R.id.disconnectBtn);
-        disconnectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Button Click", "Disconnect from robot button clicked");
-                disconnectFromDevice();
-            }
-        });
-
-        return rootView;
-    }
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.d("SettingsFragment", "onViewCreated: rootView is not null: " + (rootView != null));
-
-        // Initialize your views here
-        ListView deviceListView = view.findViewById(R.id.deviceListView);
-
-        Log.d("SettingsFragment", "onViewCreated: deviceListView is not null: " + (deviceListView != null));
-
-        // Call the updateDeviceListUI method when the view is created
-        updateDeviceListUI();
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         super.onDestroy();
-        requireActivity().unregisterReceiver(mReceiver);
-    }
+        Log.d(TAG, "MainActivity: onDestroyed: destroyed");
 
-    private void startDeviceDiscovery() {
-        Log.d("BluetoothDiscovery", "startDeviceDiscovery called");
-        // Check if Bluetooth is already discovering or not enabled
-        if (!bluetoothAdapter.isEnabled()) {
-            // Bluetooth is not enabled, prompt the user to enable it
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            // Clear the existing discovered devices
-            discoveredDevices.clear();
-
-            // Check for Bluetooth and Location permissions
-            boolean bluetoothPermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH)
-                    == PackageManager.PERMISSION_GRANTED;
-            boolean bluetoothAdminPermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_ADMIN)
-                    == PackageManager.PERMISSION_GRANTED;
-            boolean locationPermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED;
-            boolean bluetoothScanPermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN)
-                    == PackageManager.PERMISSION_GRANTED;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // For Android 12 and above
-                boolean bluetoothConnectPermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT)
-                        == PackageManager.PERMISSION_GRANTED;
-
-                if (bluetoothPermission && bluetoothAdminPermission && bluetoothConnectPermission && bluetoothScanPermission && locationPermission) {
-                    // All permissions granted, proceed with discovery
-                    Log.d("BluetoothDiscovery", "startDeviceDiscovery proceeded");
-                    bluetoothAdapter.startDiscovery();
-                } else {
-                    Log.d("BluetoothDiscovery", "startDeviceDiscovery requesting perms");
-                    // Request permissions
-                    ActivityCompat.requestPermissions(requireActivity(),
-                            new String[]{
-                                    android.Manifest.permission.BLUETOOTH,
-                                    android.Manifest.permission.BLUETOOTH_ADMIN,
-                                    android.Manifest.permission.BLUETOOTH_CONNECT,
-                                    android.Manifest.permission.BLUETOOTH_SCAN,
-                                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                            },
-                            REQUEST_BLUETOOTH_PERMISSIONS);
-                    bluetoothAdapter.startDiscovery();
-                }
-            } else {
-                // For Android 11 and below
-                if (bluetoothPermission && bluetoothAdminPermission && bluetoothScanPermission && locationPermission) {
-                    // All permissions granted, proceed with discovery
-                    bluetoothAdapter.startDiscovery();
-                } else {
-                    // Request permissions
-                    ActivityCompat.requestPermissions(requireActivity(),
-                            new String[]{
-                                    android.Manifest.permission.BLUETOOTH,
-                                    android.Manifest.permission.BLUETOOTH_ADMIN,
-                                    android.Manifest.permission.BLUETOOTH_SCAN,
-                                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                            },
-                            REQUEST_BLUETOOTH_PERMISSIONS);
-                    bluetoothAdapter.startDiscovery();
-                }
-            }
-        }
-    }
-
-    private final BroadcastReceiver mBondStateReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-                int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
-                int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
-                Log.d("BondingProcess", "Bond state changed from " + previousBondState + " to " + bondState);
-            }
-        }
-    };
-
-    // Register this receiver in your onCreateView or similar
-
-
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Discovery has found a device. Get the BluetoothDevice
-                // object and its info from the Intent.
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-
-                // Add device to a list, but don't initiate bonding here
-                discoveredDevices.add(device);
-                updateDeviceListUI();
-                // You can update your ListView here to display the new device
-            }
-        }
-    };
-
-
-
-    private void updateDeviceListUI() {
-        // Assuming you have a ListView with the id "deviceListView" in your XML layout
-        ListView deviceListView = null;
-        if (rootView != null) {
-            deviceListView = rootView.findViewById(R.id.deviceListView);
-            // Continue with your code...
-        } else {
-            // Handle the case when rootView is null (e.g., log an error).
-            Log.e("SettingsFragment", "rootView is null. Unable to find deviceListView.");
-        }
-
-
-        // Create an ArrayAdapter to bind discoveredDevices to the ListView
-        ArrayAdapter<BluetoothDevice> adapter = new ArrayAdapter<BluetoothDevice>(
-                requireContext(),
-                android.R.layout.simple_list_item_1,
-                discoveredDevices
-        ) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                BluetoothDevice device = getItem(position);
-                TextView textView = view.findViewById(android.R.id.text1);
-                if (device != null) {
-                    String deviceName = device.getName();
-                    if (deviceName != null && !deviceName.isEmpty()) {
-                        textView.setText(deviceName);
-                    } else {
-                        // If device name is not available, display the MAC address
-                        textView.setText(device.getAddress());
-                    }
-                }
-                return view;
-            }
-        };
-
-
-
-        // Set the adapter to the ListView
-        deviceListView.setAdapter(adapter);
-
-        // Set an OnItemClickListener to handle user selections
-        deviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Get the selected BluetoothDevice
-                BluetoothDevice selectedDevice = discoveredDevices.get(position);
-
-                // Connect to the selected device or perform other actions here
-                connectToDevice(selectedDevice);
-            }
-        });
+        //unregisterReceiver(btConnectionReceiver);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS) {
-            boolean allPermissionsGranted = true;
-            for (int grantResult : grantResults) {
-                if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-            if (allPermissionsGranted) {
-                // All permissions granted, proceed
-                if (permissionCallback != null) {
-                    onBluetoothPermissionGranted();
-                }
-            } else {
-                // Some permissions denied, handle accordingly
-                showToast("Bluetooth permissions denied. Cannot proceed.");
-            }
+    /*
+        SIDE MENUS ONCLICK
+    */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        //ONCLICK BLUETOOTH SEARCH BUTTON
+        if (item.getItemId() == R.id.connect) {
+            currentActivity = false;
+
+            Intent intent = new Intent(SettingsFragment.this, Connect.class);
+            //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
         }
+
+        if (item.getItemId() == R.id.reconfigure) {
+            currentActivity = false;
+
+            Intent intent = new Intent(SettingsFragment.this, Reconfigure.class);
+            // intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
-    public void onBluetoothPermissionGranted() {
-        Fragment fragment = getParentFragmentManager().findFragmentById(R.id.frame_layout);
-        if (fragment instanceof SettingsFragment) {
-            ((SettingsFragment) fragment).openDeviceListDialog();
+    //BROADCAST RECEIVER FOR INCOMING MESSAGE
+    BroadcastReceiver incomingMsgReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String msg = intent.getStringExtra("receivingMsg");
+            incomingText.setText(msg);
+
+            Log.d(TAG, "Receiving incomingMsg!!!" + msg);
+
+            //FILTER EMPTY AND CONCATENATED STRING FROM RECEIVING CHANNEL
+            if (msg.length() > 7 && msg.length() < 345) {
+
+                //CHECK IS STARTING STRING FOR ANDROID
+                if (msg.substring(0, 7).equals("Android")) {
+
+                    String[] filteredMsg = delimiterMsg(msg.replaceAll(" ", "").replaceAll("\\n", "").trim(), "\\|");
+
+                    Log.d(TAG, "Stage 1: " + filteredMsg[2]);
+
+                    switch (filteredMsg[2]) {
+
+
+                        case "arenaupdate":
+
+                            String[] mazeInfo = delimiterMsg(filteredMsg[3], ",");
+
+                            try {
+                                //ENSURE ROBOT COORDINATES IS WITHIN RANGE
+                                if (Integer.parseInt(mazeInfo[2]) > 0 && Integer.parseInt(mazeInfo[2]) < 14 && Integer.parseInt(mazeInfo[3]) > 0 && Integer.parseInt(mazeInfo[3]) < 19) {
+
+                                    myMaze.updateMaze(mazeInfo, autoUpdate);
+
+                                }
+                                //SET ROBOT STATUS TO STOP FOR EXPLORATION WHEN ROBOT RETURN TO ORIGINAL POSITION
+                                if (mazeInfo[2].equals("13") && mazeInfo[3].equals("18") && robotStatus.getText().equals(getString(R.string.FastestPath))) {
+                                    robotStatus.setText(R.string.Robot_Idle);
+                                }
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            break;
+
+                        case "robotstatus":
+                            Log.d(TAG, "RobotStatus: " + filteredMsg[3]);
+
+                            try {
+                                if (filteredMsg[3].equals("stop")) {
+                                    robotStatus.setText(R.string.Robot_Idle);
+                                } else if (filteredMsg[3].equals("moving")) {
+                                    robotStatus.setText(R.string.Robot_Moving);
+                                }
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            break;
+
+                        case "hex":
+
+                            try {
+                                String[] mapDescriptor = delimiterMsg(filteredMsg[3], ",");
+                                mapDescriptor[0] = "Part1: " + mapDescriptor[0].toUpperCase();
+                                mapDescriptor[1] = "Part2: " + mapDescriptor[1].toUpperCase();
+
+                                md5ExplorationText.setText(mapDescriptor[0]);
+                                md5ObstacleText.setText(mapDescriptor[1]);
+                                robotStatus.setText(R.string.Robot_Idle);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            break;
+                    }
+                }
+            }
         }
-    }
+    };
 
-    private AlertDialog dialog; // Declare the dialog as a member variable
+    /*
+    ONCLICKLISTENER FOR START EXPLORATION BUTTTON
+    */
+    public void onClickStartExploration() {
 
-    private void showDeviceListDialog() {
-        Log.d("SettingsFragment", "showDeviceListDialog: Displaying device list dialog");
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        View dialogView = getLayoutInflater().inflate(R.layout.device_list_dialog, null);
-        ListView deviceListView = dialogView.findViewById(R.id.deviceListView);
+        explorationBtn.setOnClickListener(new View.OnClickListener() {
 
-        ArrayList<BluetoothDevice> pairedDevices = new ArrayList<>(bluetoothAdapter.getBondedDevices());
-        Log.d("SettingsFragment", "Paired devices count: " + pairedDevices.size());
-        DeviceListAdapter adapter = new DeviceListAdapter(requireContext(), pairedDevices);
-        deviceListView.setAdapter(adapter);
+            @Override
+            public void onClick(View arg0) {
 
-        deviceListView.setOnItemClickListener((parent, view, position, id) -> {
-            BluetoothDevice selectedDevice = pairedDevices.get(position);
-            connectToDevice(selectedDevice);
-            dialog.dismiss(); // Now you can dismiss the dialog
+                int robotSp[] = myMaze.getRobotStartPoint();
+
+                //CHECK IF CONNECTED TO DEVICE FIRST
+                if (connectedDevice == null) {
+                    Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    //SEND START POINT TO RPI
+                    String spCoordinates = "Algorithm|Android|SetStartPoint|" + robotSp[0] + "," + robotSp[1];
+                    byte[] bytes = spCoordinates.getBytes(Charset.defaultCharset());
+                    BluetoothChat.writeMsg(bytes);
+
+                    //DELAY 1 SEC
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            //SEND START EXPLORATION MSG TO RPI
+                            String startExploration = "Algorithm|Android|StartExploration|1000";
+                            byte[] bytes = startExploration.getBytes(Charset.defaultCharset());
+                            BluetoothChat.writeMsg(bytes);
+
+                            Toast.makeText(SettingsFragment.this, "STARTING EXPLORATION...",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }, 1000);
+
+                    //SET ROBOT STATUS TO EXPLORATION
+                    robotStatus.setText(R.string.Exploration);
+
+                }
+            }
+
         });
 
-        builder.setView(dialogView)
-                .setTitle("Select a Device")
-                .setNegativeButton("Cancel", null);
-
-        dialog = builder.create(); // Assign the created dialog to the member variable
-        dialog.show();
     }
 
-    private void connectToDevice(BluetoothDevice device) {
-        new Thread(() -> {
-            try {
-                if (device.getBondState() == BluetoothDevice.BOND_NONE) {
-                    device.createBond();
-                    // You might want to add a delay here or listen for a bonding event to ensure the bond is complete before continuing
-                    Thread.sleep(2000);
+    /*
+      ONCLICKLISTENER FOR START SHORTEST PATH
+  */
+    public void onClickStartSp() {
+
+        ftpBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                int wayPoint[] = myMaze.getWaypoint();
+
+                //CHECK IF CONNECTED TO DEVICE FIRST
+                if (connectedDevice == null) {
+                    Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+
+                    //ENSURE WAYPOINT IS SET FIRST (20 cos waypoint is inverse when calling getWayPoint())
+                    if (wayPoint[0] == -1 && wayPoint[1] == 20) {
+                        Toast.makeText(SettingsFragment.this, "Please Select Waypoint!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    //START SHORTEST PATH
+                    else {
+
+                        //SEND START FASTEST PATH MSG TO RPI
+                        String startSP = "Algorithm|Android|StartFastestPath|1000";
+                        byte[] bytes = startSP.getBytes(Charset.defaultCharset());
+                        BluetoothChat.writeMsg(bytes);
+
+                        Toast.makeText(SettingsFragment.this, "STARTING SHORTEST PATH...",
+                                Toast.LENGTH_SHORT).show();
+
+                        //SET ROBOT STATUS TO EXPLORATION
+                        robotStatus.setText(R.string.FastestPath);
+
+                    }
+
+
                 }
 
-                ParcelUuid[] uuids = device.getUuids();
-                if (uuids != null) {
-                    for (ParcelUuid uuid : uuids) {
-                        try {
-                            bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
-                            bluetoothSocket.connect();
-                            connectedDevice = device;
-                            Log.d("Bluetooth", "Connected to " + device.getName() + " using UUID " + uuid.toString());
-                            return; // Exit thread if connection is successful
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.e("Bluetooth", "Connection error using UUID " + uuid.toString() + ": " + e.getMessage());
-                        }
+
+            }
+
+        });
+
+    }
+
+    /*
+       ONCLICKLISTENER FOR TILT BUTTON
+   */
+    public void onClickTiltSwitch() {
+
+        tiltBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+
+                    tiltNavi = true;
+                    Toast.makeText(SettingsFragment.this, "Tilt Switch On!!", Toast.LENGTH_SHORT).show();
+
+                } else {
+
+                    tiltNavi = false;
+                    Toast.makeText(SettingsFragment.this, "Tilt Switch Off!!", Toast.LENGTH_SHORT).show();
+
+
+                }
+            }
+        });
+
+
+    }
+
+    /*
+      ONCLICKLISTENER FOR SET WAY POINT BUTTON
+  */
+    public void onClickSetWaypoint() {
+
+        waypoint.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                Toast.makeText(SettingsFragment.this, "Select Waypoint for Shortest Path",
+                        Toast.LENGTH_SHORT).show();
+                myMaze.setWayPoint(true);
+
+
+            }
+
+        });
+
+    }
+
+
+    /*
+     ONCLICKLISTENER FOR SET START POINT BUTTON
+ */
+    public void onClickSetStartPoint() {
+
+        startpoint.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                myMaze.setStartPoint(true);
+                Toast.makeText(SettingsFragment.this, "Select Start Point for Robot",
+                        Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
+
+    }
+
+    /*
+        ONCLICKLISTENER FOR FORWARD MOVEMENT BUTTON
+    */
+    public void onClickNavigationForward() {
+
+        forwardBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                //CHECK IF CONNECTED TO DEVICE FIRST
+                if (connectedDevice == null) {
+                    Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+
+                    String navi = "Arduino|Android|F|01";
+                    byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                    BluetoothChat.writeMsg(bytes);
+                    Toast.makeText(SettingsFragment.this, "Forward Movement Pressed!!",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+        });
+
+    }
+
+    /*
+        ONCLICKLISTENER FOR BACKWARD MOVEMENT BUTTON
+    */
+    public void onClickNavigationBackward() {
+
+        backwardBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                //CHECK IF CONNECTED TO DEVICE FIRST
+                if (connectedDevice == null) {
+                    Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    String navi = "Arduino|Android|T|Nil";
+                    byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                    BluetoothChat.writeMsg(bytes);
+                    Toast.makeText(SettingsFragment.this, "Backward Movement Pressed!!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+
+    }
+
+    /*
+        ONCLICKLISTENER FOR LEFTWARD MOVEMENT BUTTON
+    */
+    public void onClickNavigationRight() {
+
+        rightBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                //CHECK IF CONNECTED TO DEVICE FIRST
+                if (connectedDevice == null) {
+                    Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    String navi = "Arduino|Android|R|Nil";
+                    byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                    BluetoothChat.writeMsg(bytes);
+                    Toast.makeText(SettingsFragment.this, "Right Turn Movement Pressed!!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+
+    }
+
+    /*
+        ONCLICKLISTENER FOR RIGHTWARD MOVEMENT BUTTON
+    */
+    public void onClickNavigationLeft() {
+
+        leftBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                //CHECK IF CONNECTED TO DEVICE FIRST
+                if (connectedDevice == null) {
+                    Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    String navi = "Arduino|Android|L|Nil";
+                    byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                    BluetoothChat.writeMsg(bytes);
+                    Toast.makeText(SettingsFragment.this, "Left Turn Movement Pressed!!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+
+    }
+
+    /*
+      ONCLICKLISTENER FOR MANUAL MAZE UPDATE BUTTON
+  */
+    public void onClickManualUpdate() {
+
+        manualBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+
+                myMaze.refreshMap();
+                Toast.makeText(SettingsFragment.this, "Maze Manual Update!!",
+                        Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
+
+    }
+
+    /*
+    ONCLICKLISTENER FOR AUTO MAZE UPDATE BUTTON
+   */
+    public void onClickAutoUpdate() {
+
+        autoBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+
+                    autoUpdate = true;
+
+                    // Make a toast to display toggle button status
+                    Toast.makeText(SettingsFragment.this,
+                            "Auto Update Toggle on", Toast.LENGTH_SHORT).show();
+                } else {
+
+                    autoUpdate = false;
+
+                    // Make a toast to display toggle button status
+                    Toast.makeText(SettingsFragment.this,
+                            "Auto Update Toggle off", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    //BROADCAST RECEIVER FOR BLUETOOTH CONNECTION STATUS
+    BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d(TAG, "Receiving btConnectionStatus Msg!!!");
+
+            String connectionStatus = intent.getStringExtra("ConnectionStatus");
+            myBTConnectionDevice = intent.getParcelableExtra("Device");
+            //myBTConnectionDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            //DISCONNECTED FROM BLUETOOTH CHAT
+            if (connectionStatus.equals("disconnect")) {
+
+                Log.d("SettingsFragment:", "Device Disconnected");
+                connectedDevice = null;
+                connectedState = false;
+                connectionStatusBox.setText(R.string.btStatusOffline);
+
+                if (currentActivity) {
+
+                    //RECONNECT DIALOG MSG
+                    AlertDialog alertDialog = new AlertDialog.Builder(SettingsFragment.this).create();
+                    alertDialog.setTitle("BLUETOOTH DISCONNECTED");
+                    alertDialog.setMessage("Connection with device: '" + myBTConnectionDevice.getName() + "' has ended. Do you want to reconnect?");
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    //START BT CONNECTION SERVICE
+                                    Intent connectIntent = new Intent(SettingsFragment.this, BluetoothConnectionService.class);
+                                    connectIntent.putExtra("serviceType", "connect");
+                                    connectIntent.putExtra("device", myBTConnectionDevice);
+                                    connectIntent.putExtra("id", myUUID);
+                                    startService(connectIntent);
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+
+                }
+            }
+            //SUCCESSFULLY CONNECTED TO BLUETOOTH DEVICE
+            else if (connectionStatus.equals("connect")) {
+
+                connectedDevice = myBTConnectionDevice.getName();
+                connectedState = true;
+                Log.d("MainActivity:", "Device Connected " + connectedState);
+                connectionStatusBox.setText(connectedDevice);
+                Toast.makeText(SettingsFragment.this, "Connection Established: " + myBTConnectionDevice.getName(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+            //BLUETOOTH CONNECTION FAILED
+            else if (connectionStatus.equals("connectionFail")) {
+                Toast.makeText(SettingsFragment.this, "Connection Failed: " + myBTConnectionDevice.getName(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+        }
+    };
+
+    private String[] delimiterMsg(String msg, String delimiter) {
+
+        return (msg.toLowerCase()).split(delimiter);
+    }
+
+    //METHOD FOR TILT SENSING (NAVIGATION)
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        float x = event.values[0];
+        float y = event.values[1];
+
+        //CHECK IF TILT SWITCH IS ENABLED
+        if (tiltNavi) {
+
+            //CHECK IF CONNECTED TO DEVICE FIRST
+            if (connectedDevice == null) {
+                Toast.makeText(SettingsFragment.this, "Please Connect to a Device First!!",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+
+                if (Math.abs(x) > Math.abs(y)) {
+                    if (x < 0) {
+                        Log.d("SettingsFragment:", "RIGHT TILT!!");
+
+                        String navi = "Arduino|Android|R|Nil";
+                        byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                        BluetoothChat.writeMsg(bytes);
+                       /* Toast.makeText(MainActivity.this, "Right Movement Detected!!",
+                                Toast.LENGTH_SHORT).show();*/
+                    }
+                    if (x > 0) {
+                        Log.d("SettingsFragment:", "LEFT TILT!!");
+
+                        String navi = "Arduino|Android|L|Nil";
+                        byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                        BluetoothChat.writeMsg(bytes);
+                        /*Toast.makeText(MainActivity.this, "Left Movement Detected!!",
+                                Toast.LENGTH_SHORT).show();*/
                     }
                 } else {
-                    // Fallback to hardcoded UUID if device.getUuids() returns null
-                    UUID sppUuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-                    bluetoothSocket = device.createRfcommSocketToServiceRecord(sppUuid);
-                    bluetoothSocket.connect();
-                    connectedDevice = device;
-                    Log.d("Bluetooth", "Connected to " + device.getName());
+                    if (y < 0) {
+                        Log.d("SettingsFragment:", "UP TILT!!");
+
+                        String navi = "Arduino|Android|F|01";
+                        byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                        BluetoothChat.writeMsg(bytes);
+                        /*Toast.makeText(MainActivity.this, "Forward Movement Detected!!",
+                                Toast.LENGTH_SHORT).show();*/
+                    }
+                    if (y > 0) {
+                        Log.d("SettingsFragment:", "DOWN TILT!!");
+
+                        String navi = "Arduino|Android|T|Nil";
+                        byte[] bytes = navi.getBytes(Charset.defaultCharset());
+                        BluetoothChat.writeMsg(bytes);
+                        /*Toast.makeText(MainActivity.this, "Down Movement Detected!!",
+                                Toast.LENGTH_SHORT).show();*/
+                    }
                 }
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                Log.e("Bluetooth", "Connection error: " + e1.getMessage());
-                // Fallback method for connection
-                try {
-                    bluetoothSocket = (BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(device,1);
-                    bluetoothSocket.connect();
-                    connectedDevice = device;
-                    Log.d("Bluetooth", "Connected to " + device.getName() + " using fallback method.");
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                    Log.e("Bluetooth", "Fallback connection failed: " + e2.getMessage());
+       /* if (x > (-2) && x < (2) && y > (-2) && y < (2)) {
+            Log.d("MainActivity:", "NOT TILTED!!");
+
+        }*/
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+  /*  //REVERSE STRING FOR MAP DESCRIPTOR MD5
+    public String reverseString(String md5){
+        int count = 299 - 15;
+        String temp = "";
+        for(int i= count; count < md5.length(); i++){
+
+        }
+
+
+
+        return temp.toString();
+    }
+
+    //METHOD TO GET MAP DESCRIPTOR FOR EXPLORATION
+    public String mapDescExploration(String md5){
+
+        String tempMd5 = "11";
+
+        for(int i = 0; i < md5.length(); i++)
+        {
+            char c = md5.charAt(i);
+
+            if(c != '3'){
+                tempMd5 += "1";
+            }
+            else{
+                tempMd5 +="0";
+            }
+
+        }
+
+        tempMd5 += "11";
+
+        Log.d("MainActivity:", "map descriptor for exploration: " + tempMd5);
+
+        return convertHex(tempMd5);
+    }
+
+    //METHOD TO GET MAP DESCRIPTOR FOR OBSTACLE
+    public String mapDescObstacle(String md5){
+
+        String tempMd5 = "";
+
+        for(int i = 0; i < md5.length(); i++)
+        {
+            char c = md5.charAt(i);
+
+            if(c != '3'){
+
+                if(c == '2'){
+                    tempMd5 += "1";
+                }
+                else{
+                    tempMd5 += "0";
+
                 }
             }
-        }).start();
 
-
-
-
-
-
-
-    // The connection attempt succeeded. Perform work associated with
-        // the connection in a separate thread
-        manageMyConnectedSocket(bluetoothSocket);
-    }
-    private void manageMyConnectedSocket(BluetoothSocket socket) {
-        // TODO: Perform work associated with the connection in a separate thread
-    }
-
-
-    private void disconnectFromDevice() {
-        if (bluetoothSocket != null) {
-            try {
-                bluetoothSocket.close();
-                Log.d("Bluetooth", "Disconnected from " + connectedDevice.getName());
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("Bluetooth", "Disconnection error: " + e.getMessage());
-            }
         }
+        Log.d("MainActivity:", "map descriptor for obstacle: " + tempMd5);
+
+        return convertHex(tempMd5);
+
     }
 
-    // DeviceListAdapter class
-    private class DeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
+    //METHOD TO CONVERT BINARY STRING TO HEXADECIMAL
+    public String convertHex(String md5){
 
-        public DeviceListAdapter(Context context, List<BluetoothDevice> devices) {
-            super(context, 0, devices);
+        String hex = "";
+        StringBuilder sb = new StringBuilder();
+
+        int temp = md5.length() %4;
+
+        if(temp != 0){
+
+            for(int i=0; i<temp; i++){
+                sb.append('0');
+            }
+            sb.append(md5);
         }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            BluetoothDevice device = getItem(position);
-
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+        int digitNumber = 1;
+        int sum = 0;
+        for(int i = 0; i < md5.length(); i++){
+            if(digitNumber == 1)
+                sum+=Integer.parseInt(md5.charAt(i) + "")*8;
+            else if(digitNumber == 2)
+                sum+=Integer.parseInt(md5.charAt(i) + "")*4;
+            else if(digitNumber == 3)
+                sum+=Integer.parseInt(md5.charAt(i) + "")*2;
+            else if(digitNumber == 4 || i < md5.length()+1){
+                sum+=Integer.parseInt(md5.charAt(i) + "")*1;
+                digitNumber = 0;
+                if(sum < 10) {
+                    hex += String.valueOf(sum);
+                }
+                else if(sum == 10) {
+                    hex += "A";
+                    //System.out.print("A");
+                }
+                else if(sum == 11){
+                    hex += "B";
+                    // System.out.print("B");
+                }
+                else if(sum == 12) {
+                    hex += "C";
+                    //System.out.print("C");
+                }
+                else if(sum == 13) {
+                    hex += "D";
+                    //System.out.print("D");
+                }
+                else if(sum == 14) {
+                    hex += "E";
+                    // System.out.print("E");
+                }
+                else if(sum == 15) {
+                    hex += "F";
+                    //System.out.print("F");
+                }
+                sum=0;
             }
-
-            TextView deviceNameTextView = convertView.findViewById(android.R.id.text1);
-
-            if (device != null) {
-                deviceNameTextView.setText(device.getName());
-            } else {
-                // Display a message when no devices are found
-                deviceNameTextView.setText("No devices found");
-            }
-
-            return convertView;
+            digitNumber++;
         }
-    }
 
+        Log.d("MainActivity:", "hex after convertion: " + hex);
+
+
+        return hex;
+    }*/
 }
+
 
