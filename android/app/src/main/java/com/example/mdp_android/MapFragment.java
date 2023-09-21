@@ -410,8 +410,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                             setGridCellBorderColor("None");
                             // If the drop position is not valid within the grid,
                             // Set appropriate layout parameters for the image
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(15, 15);
-                            params.setMargins(5, 0, 5, 0);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
+                            params.setMargins(10, 0, 10, 0);
                             draggedImage.setLayoutParams(params);
                             draggedImage.setPadding(0,0,0,0);
 
