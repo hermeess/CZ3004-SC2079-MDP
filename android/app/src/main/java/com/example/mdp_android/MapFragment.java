@@ -172,11 +172,16 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         Button buttonUp = rootView.findViewById(R.id.buttonUp);
         Button buttonDown = rootView.findViewById(R.id.buttonDown);
         Button buttonSendToRpi = rootView.findViewById(R.id.buttonSendObstacle);
-        // This two are part of testing (can be removed afterwards)
-        Button buttonRotate = rootView.findViewById(R.id.buttonRotate);
-        Button buttonChange = rootView.findViewById(R.id.buttonChange);
 
         Button buttonAdd = rootView.findViewById(R.id.addObstacles);
+        Button buttonStart = rootView.findViewById(R.id.startButton);
+
+        buttonStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //send to RPi (Start)
+            }
+        });
 
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -245,25 +250,6 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             }
         });
 
-        buttonRotate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // For testing purpose, hardcoded to show that robot direction will change
-                ImageInfo robotInfo = imageInfoMap.get("robot");
-                if(robotInfo.getCol() != -1 && robotInfo.getRow() != -1) {
-                    updateRobot(robotInfo.getRow(), robotInfo.getCol(), 90, "ROBOT");
-                }
-            }
-        });
-
-        buttonChange.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Hardcoded to show that target & obstacle will change if mismatch & background will be changed
-                updateTarget("11", "12");
-            }
-        });
-
 
         // Setting a rowArr for row tick labels
         int rowVal = 21;
@@ -324,7 +310,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                 params.height = 0;
                 params.rowSpec = GridLayout.spec(rowArr[row], 1f);
                 params.columnSpec = GridLayout.spec(col, 1f);
-                params.setMargins(5,10,5,10);
+                params.setMargins(5,5,5,5);
 
                 // Set background color for the cellImageView
                 cellImageView.setBackgroundColor(Color.parseColor("#D3D3D3"));
@@ -359,8 +345,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             imageView.setImageResource(drawableResource);
 
             // Set layout parameters for the ImageView
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
-            params.setMargins(5, 0, 5, 0);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
+            params.setMargins(10, 0, 10, 0);
             imageView.setLayoutParams(params);
 
             // Add the OnLongClickListener to start dragging
@@ -423,7 +409,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                             setGridCellBorderColor("None");
                             // If the drop position is not valid within the grid,
                             // Set appropriate layout parameters for the image
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(15, 15);
                             params.setMargins(5, 0, 5, 0);
                             draggedImage.setLayoutParams(params);
                             draggedImage.setPadding(0,0,0,0);
@@ -621,8 +607,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                     } else if (v != targetGrid) {
                         // If the drop position is not valid within the grid,
                         // set appropriate layout parameters for the image
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
-                        params.setMargins(5, 0, 5, 0);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
+                        params.setMargins(10, 0, 10, 0);
                         draggedImage.setLayoutParams(params);
 
                         // Append the image to the end of the LinearLayout
@@ -762,8 +748,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             targetParams.height = 0;
             targetParams.rowSpec = GridLayout.spec(rowArr[targetInfo.getRow()], 1f);
             targetParams.columnSpec = GridLayout.spec(targetInfo.getCol(), 1f);
-            targetParams.setMargins(5, 0, 5, 0);
-            targetImageView.setPadding(0, 5, 0, 5);
+            targetParams.setMargins(5, 5, 5, 5);
+            targetImageView.setPadding(0, 5,0, 5);
             targetImageView.setLayoutParams(targetParams);
 
             GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
@@ -777,8 +763,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             if(obstacleParent != null){
                 obstacleParent.removeView(obstacleImageView);
             }
-            LinearLayout.LayoutParams obstacleParams = new LinearLayout.LayoutParams(40, 40);
-            obstacleParams.setMargins(20, 0, 20, 0);
+            LinearLayout.LayoutParams obstacleParams = new LinearLayout.LayoutParams(25, 25);
+            obstacleParams.setMargins(10, 0, 10, 0);
             obstacleImageView.setLayoutParams(obstacleParams);
             obstacleInfo.setDirection("None");
             obstacleInfo.setRow(-1);
@@ -883,9 +869,12 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         JSONArray jsonArray = new JSONArray(list);
         JSONObject json = new JSONObject();
         json.put("obstacle", jsonArray);
+        JSONObject finalJson = new JSONObject();
+        finalJson.put("cat", "obstacle");
+        finalJson.put("value", json);
 
         //>>Bluetooth this is the object to send to RPi;
-        Log.d("Obstacle json", json.toString());
+        Log.d("Obstacle json", finalJson.toString());
     }
 
 
@@ -933,8 +922,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                 LinearLayout linearLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
 
                 // Set appropriate layout parameters for the image
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
-                params.setMargins(5, 0, 5, 0);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
+                params.setMargins(10, 0, 10, 0);
                 currentObstacleImageView.setLayoutParams(params);
                 currentObstacleImageView.setPadding(0,0,0,0);
 
@@ -999,6 +988,19 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         }
         return isOccupiedKey;
     }
+
+
+    //>>BLuetooth receive from RPi
+    /*
+    public void receiveFromRPi(JSONObject payload){
+        cat = jsonobject.get('cat');
+        switch(cat){
+            'info'
+                textview statusmessage = r.
+             '
+    }
+
+     */
 }
 
 /*

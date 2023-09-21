@@ -6,11 +6,6 @@
         android:icon="@drawable/baseline_location_searching_24"
         />
     <item
-        android:id="@+id/message"
-        android:title="Message"
-        android:icon="@drawable/baseline_announcement_24"
-        />
-    <item
         android:id="@+id/settings"
         android:title="Settings"
         android:icon="@drawable/baseline_app_settings_alt_24"

@@ -10,7 +10,7 @@
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="30dp">
 
         <LinearLayout
             android:id="@+id/horizontalScrollViewLayout"
@@ -26,7 +26,7 @@
     <GridLayout
         android:id="@+id/gridLayout"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="720dp"
         android:layout_below="@id/horizontalScrollView"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
@@ -158,7 +158,7 @@
                 android:id="@+id/buttonUp"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginBottom="2dp"
+                android:layout_marginBottom="5dp"
                 android:textFontWeight="1000"
                 app:layout_column="1"
                 app:layout_row="0"
@@ -199,44 +199,92 @@
                 android:textColor="#000000"/>
         </androidx.gridlayout.widget.GridLayout>
         <!-- Buttons go here -->
-        <Button
-            android:id="@+id/addObstacles"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
-            android:text="Add"
-            android:textSize="4sp"
-            />
+
         <LinearLayout
-        android:layout_width="65dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+            <Button
+                android:id="@+id/addObstacles"
+                android:layout_width="70dp"
+                android:layout_height="35dp"
+                android:text="Add"
+                android:textSize="8sp"
+                />
         <Button
             android:id="@+id/buttonSendObstacle"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="35dp"
             android:text="Send to RPi"
-            android:textSize="4sp"
+            android:textSize="8sp"
             />
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="Start"
+                android:textSize="8sp"
+                />
 
-        <Button
-            android:id="@+id/buttonRotate"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Rotate"
-            android:textSize="4sp"/>
 
-        <Button
-            android:id="@+id/buttonChange"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Change"
-            android:textSize="4sp"/>
+        </LinearLayout>
+
+        <!-- Status and bluetooth status-->
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/statusHeader"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/gridLayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text="Status Message: "
+                android:textSize="6sp"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/statusMessage"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/gridLayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="1dp"
+                android:text="... "
+                android:textSize="6sp"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/bluetoothHeader"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/gridLayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text="Bluetooth Status: "
+                android:textSize="6sp"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/bluetoothStatus"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/gridLayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="1dp"
+                android:text="Connected/Not Connected"
+                android:textSize="6sp"
+                android:textColor="#000000" />
+
 
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
@@ -248,7 +296,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
                 android:text="Robot: X: -1, Y: -1, Direction: "
-                android:textSize="6sp"
+                android:textSize="8sp"
                 android:textColor="#000000" />
 
             <TextView
@@ -260,7 +308,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
                 android:text="Obstacles Content..."
-                android:textSize="6sp"
+                android:textSize="7sp"
                 android:textColor="#000000" />
         </LinearLayout>
     </LinearLayout>
