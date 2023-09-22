@@ -8,7 +8,7 @@ import math
 
 def load_model():
     # model = torch.hub.load('./', 'custom', path='week8.pt', source='local')
-    model = YOLO('../weights/week9.pt')
+    model = YOLO('../image-recognition/weights/week9_2.03.pt')
     return model
 
 def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
