@@ -93,7 +93,7 @@ class RaspberryPi:
             msg_str = """{
                         "cat": "obstacles",
                         "value": {
-                            "obstacles": [{"x": 5, "y": 5, "id": 1, "d": 0}],
+                            "obstacles": [{"x": 5, "y": 5, "id": 1, "d": 4}],
                             "mode": "0"
                         }
                     }"""
@@ -206,6 +206,7 @@ class RaspberryPi:
                 if len(self.failed_obstacles) != 0:
                     new_obstacle_list = []
                     self.d += 2 ## move to diff dir
+                    self.d = self.d % 8
                     for i in list(self.failed_obstacles):
                         # {'x': 5, 'y': 11, 'id': 1, 'd': 4}
                         i['d'] = self.d
