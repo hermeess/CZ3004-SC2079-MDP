@@ -99,7 +99,7 @@ class RaspberryPi:
 
             # Send success message to Android
             self.android_queue.put(AndroidMessage('info', 'Robot is ready!'))
-            self.android_queue.put(AndroidMessage('mode', 'path' if self.robot_mode.value == 1 else 'manual'))
+            #self.android_queue.put(AndroidMessage('mode', 'path' if self.robot_mode.value == 1 else 'manual'))
             
             
             
@@ -153,7 +153,7 @@ class RaspberryPi:
 
             self.logger.info("Android child processes restarted")
             self.android_queue.put(AndroidMessage("info", "You are reconnected!"))
-            self.android_queue.put(AndroidMessage('mode', 'path' if self.robot_mode.value == 1 else 'manual'))
+            #self.android_queue.put(AndroidMessage('mode', 'path' if self.robot_mode.value == 1 else 'manual'))
 
             self.android_dropped.clear()
             
@@ -205,7 +205,7 @@ class RaspberryPi:
                         
 
                     self.logger.info("Start command received, starting robot on Week 9 task!")
-                    self.android_queue.put(AndroidMessage('status', 'running'))
+                    self.android_queue.put(AndroidMessage('info', 'running'))
 
                     # Commencing path following | Main trigger to start movement #
                     self.unpause.set()
@@ -262,7 +262,7 @@ class RaspberryPi:
 
                 if self.ack_count == 6:
                     self.logger.debug("Second ACK received from STM32!")
-                    self.android_queue.put(AndroidMessage("status", "finished"))
+                    self.android_queue.put(AndroidMessage("info", "finished"))
                     self.command_queue.put("FIN")
 
                 # except Exception:
@@ -297,7 +297,7 @@ class RaspberryPi:
                 self.movement_lock.release()
                 self.logger.info("Commands queue finished.")
                 self.android_queue.put(AndroidMessage("info", "Commands queue finished."))
-                self.android_queue.put(AndroidMessage("status", "finished"))
+                self.android_queue.put(AndroidMessage("info", "finished"))
                 self.rpi_action_queue.put(PiAction(cat="stitch", value=""))
             else:
                 raise Exception(f"Unknown command: {command}")

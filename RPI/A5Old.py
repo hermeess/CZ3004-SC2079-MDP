@@ -91,6 +91,25 @@ class RaspberryPi:
             ### Start up complete ###
             ### Set obstacles to be (5,5), ini robot pos to be (5, 1)
 
+            msg_str = """{
+                        "cat": "obstacles",
+                        "value": {
+                            "obstacles": [{"x": 5, "y": 6, "id": 1, "d": 4}],
+                            "mode": "0"
+                        }
+                    }"""
+            message: dict = json.loads(msg_str)
+            ## Command: Set obstacles ##
+            if message['cat'] == "obstacles":
+                self.rpi_action_queue.put(PiAction(**message))
+                self.logger.debug(
+                    f"Set obstacles PiAction added to queue: {message}")
+
+            ## Command: Start Moving ##
+            if not self.check_api():
+                self.logger.error(
+                    "API is down! Start command aborted.")
+                        
             self.logger.info("Gryo reset!")
             self.stm_link.send("RS000")
             # Main trigger to start movement #
@@ -121,24 +140,6 @@ class RaspberryPi:
                     self.rs_flag = True
                     self.logger.debug("ACK for RS000 from STM32 received.")
                     
-                    msg_str = """{
-                                "cat": "obstacles",
-                                "value": {
-                                    "obstacles": [{"x": 5, "y": 6, "id": 1, "d": 4}],
-                                    "mode": "0"
-                                }
-                            }"""
-                    message: dict = json.loads(msg_str)
-                    ## Command: Set obstacles ##
-                    if message['cat'] == "obstacles":
-                        self.rpi_action_queue.put(PiAction(**message))
-                        self.logger.debug(
-                            f"Set obstacles PiAction added to queue: {message}")
-
-                    ## Command: Start Moving ##
-                    if not self.check_api():
-                        self.logger.error(
-                            "API is down! Start command aborted.")
                     continue
                 try:
                     self.movement_lock.release()
