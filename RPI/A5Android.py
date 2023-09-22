@@ -118,6 +118,30 @@ class RaspberryPi:
         self.stm_link.disconnect()
         self.logger.info("Program exited!")
 
+    def old_to_new(self, d):
+        if (d == 0):
+            d = 90
+        elif (d == 2):
+            d = 0
+        elif (d == 4):
+            d = -90
+        elif (d == 6):
+            d = 180
+
+        return d    
+    
+    def new_to_old(self, d):
+        if (d == 90):
+            d = 0
+        elif (d == 0):
+            d = 2
+        elif (d == -90):
+            d = 4
+        elif (d == 180):
+            d = 6
+
+        return d
+
     def reconnect_android(self):
         """Handles the reconnection to Android in the event of a lost connection."""
         self.logger.info("Reconnection handler is watching...")
@@ -244,7 +268,7 @@ class RaspberryPi:
                     self.android_queue.put(AndroidMessage('location', {
                         "x": cur_location['x'],
                         "y": cur_location['y'],
-                        "d": cur_location['d'],
+                        "d": self.old_to_new(cur_location['d']),
                     }))
 
                 except Exception:
@@ -347,8 +371,9 @@ class RaspberryPi:
                 f"PiAction retrieved from queue: {action.cat} {action.value}")
 
             if action.cat == "obstacles":
-                for obs in action.value['obstacles']:
+                for i, obs in enumerate(action.value['obstacles']):
                     self.obstacles[obs['id']] = obs
+                    action.value['obstacles'][i]['d'] = self.new_to_old(obs['d'])
                 self.request_algo(action.value)
             elif action.cat == "snap":
                 self.snap_and_rec(obstacle_id_with_signal=action.value)
