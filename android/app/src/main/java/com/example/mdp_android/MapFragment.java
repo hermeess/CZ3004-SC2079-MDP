@@ -152,7 +152,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     Switch tiltBtn;
     ToggleButton autoBtn;
     TextView incomingText;
-    TextView robotStatus;
+    TextView statusContent;
     TextView connectionStatusBox;
     TextView md5ExplorationText;
     TextView md5ObstacleText;
@@ -234,13 +234,21 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         connectedState = false;
         currentActivity = true;
         connectionStatusBox = rootView.findViewById(R.id.connectionStatus);
-        robotStatus = rootView.findViewById(R.id.robotStatus);
+        statusContent = rootView.findViewById(R.id.statusContent);
         incomingText = rootView.findViewById(R.id.statusHeader);
         incomingText.setMovementMethod(new ScrollingMovementMethod());
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //send to RPi (Start)
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("cat", "control");
+                    json.put("value", "start");
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                BluetoothChat.writeMsg(json.toString().getBytes(Charset.defaultCharset()));
             }
         });
 
@@ -483,6 +491,49 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                             obstacleMap.remove(drawableTag);
                             Log.d("Updated Obstacle Map", obstacleMap.toString());
                             //>>if want can send string "Obstacle ... removed"
+
+                            TextView obstacleContent = rootView.findViewById(R.id.obstacleContent);
+
+                            StringBuilder resultString = new StringBuilder();
+
+                            // Iterate through the entries in the obstacleMap and extract key info
+                            for (HashMap.Entry<String, JSONObject> entry : obstacleMap.entrySet()) {
+                                String key = entry.getKey();
+                                JSONObject obstacleData = entry.getValue();
+
+                                int x = obstacleData.optInt("x", -1)+1;
+                                int y = obstacleData.optInt("y", -1)+1;
+                                int dir = obstacleData.optInt("d", -1);
+                                String dirStr = "";
+                                switch(dir) {
+                                    case 90:
+                                        dirStr = "N";
+                                        break;
+                                    case -90:
+                                        dirStr = "S";
+                                        break;
+                                    case 180:
+                                        dirStr = "W";
+                                        break;
+                                    case 0:
+                                        dirStr = "E";
+                                        break;
+                                    default:
+                                        dirStr = "None";
+                                        break;
+                                }
+
+                                // Check if all required values are present
+                                if (x != -1 && y != -1) {
+                                    // Append the formatted string to the result
+                                    resultString.append(key).append(": x: ").append(x).append(", y: ").append(y)
+                                            .append(", dir: ").append(dirStr).append("\n");
+                                }
+                            }
+                            // Convert the StringBuilder to a final string
+                            String formattedObstacleData = resultString.toString();
+
+                            obstacleContent.setText(formattedObstacleData);
                             return true;
                     }
                     return true;
@@ -599,7 +650,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                 imageInfo.setDirection(direction);
                 String obstacleJson = constructObstacleJson(imageInfo, selectedImageViewTag);
                 if (obstacleJson != null) {
-                    BluetoothChat.writeMsg(obstacleJson.getBytes(Charset.defaultCharset()));
+//                    BluetoothChat.writeMsg(obstacleJson.getBytes(Charset.defaultCharset()));
+                    Log.d("Obstacle json", obstacleJson.toString());
                 }
                 //Send the data to bluetooth here, this is the one with the updated direction + x,y
                 Log.d("ImageInfo", imageInfo.toString());
@@ -710,7 +762,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                             boolean isRobotImage = draggedImageTag.equals("robot");
                             String updatedImageJson = constructUpdatedImageJson(imageInfo, draggedImageTag, isRobotImage);
                             if (updatedImageJson != null) {
-                                BluetoothChat.writeMsg(updatedImageJson.getBytes(Charset.defaultCharset()));
+//                                BluetoothChat.writeMsg(updatedImageJson.getBytes(Charset.defaultCharset()));
+                                  Log.d("Updated Image Json", updatedImageJson.toString());
                             }
                             // Adding the obstacle to obstacle map;
                             try {
@@ -785,6 +838,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         try {
             JSONObject mainObject = new JSONObject();
 
+            mainObject.put("cat", "move");
             mainObject.put("tag", "robot");
             mainObject.put("x", newCol - 1); // Adjusting for 0-based index
             mainObject.put("y", newRow - 1); // Adjusting for 0-based index
@@ -843,7 +897,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         if(action.equals("MOVE")){
             String robotJson = constructRobotJson(newRow, newCol, direction);
             if (robotJson != null) {
-                BluetoothChat.writeMsg(robotJson.getBytes(Charset.defaultCharset()));
+//                BluetoothChat.writeMsg(robotJson.getBytes(Charset.defaultCharset()));
+                  Log.d("Robot moving", "Robot moved");
             }
             //>> bluetooth Send the details to RPi for robot to move;
             //need to -1 from row and col when sending to RPI;
@@ -1027,6 +1082,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
 
         //>>Bluetooth this is the object to send to RPi;
         Log.d("Obstacle json", finalJson.toString());
+        BluetoothChat.writeMsg(finalJson.toString().getBytes(Charset.defaultCharset()));
     }
 
 
@@ -1146,7 +1202,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             String msg = intent.getStringExtra("receivingMsg");
 
             // Update the UI
-            incomingText.setText(msg);
+//            incomingText.setText(msg);
 
             // Process the JSON message
             processJsonMessage(msg);
@@ -1236,10 +1292,10 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         try {
             JSONObject mainObject = new JSONObject(jsonMsg);
             String category = mainObject.getString("cat");
-            JSONObject valueObj = mainObject.getJSONObject("value");
 
             switch (category) {
                 case "location":
+                    JSONObject valueObj = mainObject.getJSONObject("value");
                     int x = valueObj.getInt("x");
                     int y = valueObj.getInt("y");
                     int d = valueObj.getInt("d");
@@ -1250,12 +1306,20 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                     break;
 
                 case "image-rec":
+                    valueObj = mainObject.getJSONObject("value");
                     String image_id = valueObj.getString("image_id");
                     String obstacle_id = valueObj.getString("obstacle_id");
                     updateTarget(image_id, obstacle_id);
                     break;
 
                 // Add other cases as needed
+
+                case "info":
+                    String statusMessage = mainObject.getString("value");
+                    Log.d("Status message", statusMessage);
+                    statusContent.setText(statusMessage);
+                    break;
+
                 default:
                     Log.w("ProcessJson", "Unknown category: " + category);
                     break;

@@ -145,6 +145,27 @@
                     android:layout_marginLeft="2dp"/>
             </LinearLayout>
 
+            <!--   Found legend         -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="#39FF14" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Found"
+                    android:textSize="8sp"
+                    android:textColor="#000000"
+                    android:layout_marginLeft="2dp"/>
+            </LinearLayout>
+
         </LinearLayout>
 
         <androidx.gridlayout.widget.GridLayout
@@ -243,10 +264,10 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:text="Status Message: "
-                android:textSize="6sp"
+                android:textSize="8sp"
                 android:textColor="#000000" />
             <TextView
-                android:id="@+id/robotStatus"
+                android:id="@+id/statusContent"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -254,7 +275,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="1dp"
                 android:text="... "
-                android:textSize="6sp"
+                android:textSize="8sp"
                 android:textColor="#000000" />
             <TextView
                 android:id="@+id/bluetoothHeader"
@@ -265,7 +286,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:text="Bluetooth Status: "
-                android:textSize="6sp"
+                android:textSize="8sp"
                 android:textColor="#000000" />
             <TextView
                 android:id="@+id/connectionStatus"
@@ -276,7 +297,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="1dp"
                 android:text="Connected/Not Connected"
-                android:textSize="6sp"
+                android:textSize="8sp"
                 android:textColor="#000000" />
 
 

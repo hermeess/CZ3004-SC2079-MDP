@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/editObstacleId"
         android:layout_marginTop="16dp"
-        android:hint="Row" />
+        android:hint="Row (Y)" />
 
     <EditText
         android:id="@+id/editCol"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/editRow"
         android:layout_marginTop="16dp"
-        android:hint="Col" />
+        android:hint="Col (X)" />
 
     <EditText
         android:id="@+id/editDirection"
