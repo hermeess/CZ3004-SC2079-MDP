@@ -30,7 +30,7 @@ def image_rec():
     obstacle_id = parts[1]  # <obstacle_id>
     signal = parts[2].split(".")[0]  # <signal>
 
-    filename = parts[0] # only leave the timestamp for filename
+    filename = parts[0] + '.jpg' # only leave the timestamp for filename
 
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
@@ -41,8 +41,8 @@ def image_rec():
     rec_result = rec_image(filename, model, signal)
 
     result = {
-        "image_id": int(rec_result['image_id']),
-        "obstacle_id": int(obstacle_id)
+        "image_id": str(rec_result['image_id']),
+        "obstacle_id": str(obstacle_id)
     }
 
     return jsonify(result)
@@ -54,4 +54,4 @@ def combine():
     return jsonify({"result": "ok"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5007, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

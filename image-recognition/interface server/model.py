@@ -141,7 +141,7 @@ def rec_image(image, model, signal):
 
     draw_bbox(np.array(img),image, final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3], final_id)
 
-    return rec_result
+    return final_rec
 
 def rec_image_week9(image, model, signal):
     
