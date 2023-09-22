@@ -79,7 +79,9 @@ def rec_image(image, model, signal):
     rec_result = []
 
     if len(result.boxes) == 0:
-        return rec_result
+        return {
+            'image_id': 'NA'
+        }
 
     print("-----Recognize results-----")
     for box in result.boxes:
