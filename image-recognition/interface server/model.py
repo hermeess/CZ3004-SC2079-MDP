@@ -7,8 +7,8 @@ import glob
 import math
 
 def load_model():
-    # model = torch.hub.load('./', 'custom', path='week8.pt', source='local')
-    model = YOLO('../image-recognition/weights/week9_2.03.pt')
+    # model = torch.hub.load('./', 'custom', path='../weights/Week8_senior.pt', source='local')
+    model = YOLO('../weights/week8_final.pt')
     return model
 
 def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
@@ -135,7 +135,7 @@ def rec_image(image, model, signal):
             final_rec = shortlisted_rec_result[0]
 
     else: # only one result in list
-        final_rec = rec_result[0]
+        final_rec = filtered_rec_result[0]
 
 
     final_bbox = final_rec['bbox']
