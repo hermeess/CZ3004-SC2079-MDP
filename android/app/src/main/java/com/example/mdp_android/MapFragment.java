@@ -1,20 +1,20 @@
 package com.example.mdp_android;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -23,20 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.Switch;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import java.nio.charset.Charset;
-import java.util.UUID;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,6 +44,7 @@ import org.json.JSONObject;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -1219,6 +1214,15 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
 
             String connectionStatus = intent.getStringExtra("ConnectionStatus");
             myBTConnectionDevice = intent.getParcelableExtra("Device");
+            if (myBTConnectionDevice == null) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                String lastDeviceAddress = prefs.getString("lastConnectedDeviceAddress", null);
+
+                if (lastDeviceAddress != null) {
+                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                    myBTConnectionDevice = adapter.getRemoteDevice(lastDeviceAddress);
+                }
+            }
             //myBTConnectionDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             //DISCONNECTED FROM BLUETOOTH CHAT
             if (connectionStatus.equals("disconnect")) {
@@ -1234,7 +1238,9 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                     AlertDialog alertDialog = new AlertDialog.Builder(requireActivity()).create();
 
                     alertDialog.setTitle("BLUETOOTH DISCONNECTED");
-                    alertDialog.setMessage("Connection with device: '" + myBTConnectionDevice.getName() + "' has ended. Do you want to reconnect?");
+                    String deviceName = (myBTConnectionDevice != null) ? myBTConnectionDevice.getName() : "Unknown Device";
+                    alertDialog.setMessage("Connection with device: '" + deviceName + "' has ended. Do you want to reconnect?");
+
                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -1246,6 +1252,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                                     connectIntent.putExtra("device", myBTConnectionDevice);
                                     connectIntent.putExtra("id", myUUID);
                                     requireActivity().startService(connectIntent);
+
 
                                 }
                             });
@@ -1263,6 +1270,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             else if (connectionStatus.equals("connect")) {
 
                 if (myBTConnectionDevice != null) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    prefs.edit().putString("lastConnectedDeviceAddress", myBTConnectionDevice.getAddress()).apply();
                     connectedDevice = myBTConnectionDevice.getName();
                     connectedState = true;
                     Log.d("MainActivity:", "Device Connected " + connectedState);

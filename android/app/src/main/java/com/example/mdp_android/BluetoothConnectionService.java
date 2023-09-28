@@ -180,7 +180,10 @@ public class BluetoothConnectionService extends IntentService {
                 for (ParcelUuid uuid : uuids) {
                     try {
                         temp = myDevice.createRfcommSocketToServiceRecord(uuid.getUuid());
+                        Log.d(TAG, "Before temp.connect()");
                         temp.connect();
+                        Log.d(TAG, "After temp.connect()");
+
 
                         // BROADCAST CONNECTION MSG
                         connectionStatusIntent = new Intent("btConnectionStatus");
@@ -191,7 +194,13 @@ public class BluetoothConnectionService extends IntentService {
                         Log.d(TAG, "Connected to " + myDevice.getName() + " using UUID " + uuid.toString());
 
                         // START BLUETOOTH CHAT
-                        BluetoothChat.connected(temp, myDevice, myContext);
+                        if (temp.isConnected()) {
+                            Log.d(TAG, "Socket connected. Attempting to start chat...");
+
+                            BluetoothChat.connected(temp, myDevice, myContext);
+
+                            Log.d(TAG, "Chat method called.");
+                        }
                         return;  // Exit if connection is successful
                     } catch (Exception e) {
                         Log.e(TAG, "Connection error using UUID " + uuid.toString() + ": " + e.getMessage());

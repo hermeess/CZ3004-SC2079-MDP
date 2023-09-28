@@ -1,7 +1,8 @@
 package com.example.mdp_android;
 
+import static java.security.AccessController.getContext;
+
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -12,12 +13,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.AppCompatActivity;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +27,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -318,7 +322,9 @@ public class Connect extends AppCompatActivity {
                 //RECONNECT DIALOG MSG
                 AlertDialog alertDialog = new AlertDialog.Builder(Connect.this).create();
                 alertDialog.setTitle("BLUETOOTH DISCONNECTED");
-                alertDialog.setMessage("Connection with device: '"+myBTConnectionDevice.getName()+"' has ended. Do you want to reconnect?");
+                String deviceName = (myBTConnectionDevice != null) ? myBTConnectionDevice.getName() : "Unknown Device";
+                alertDialog.setMessage("Connection with device: '" + deviceName + "' has ended. Do you want to reconnect?");
+
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -337,7 +343,8 @@ public class Connect extends AppCompatActivity {
 
             //SUCCESSFULLY CONNECTED TO BLUETOOTH DEVICE
             else if(connectionStatus.equals("connect")){
-
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                prefs.edit().putString("lastConnectedDeviceAddress", myBTConnectionDevice.getAddress()).apply();
 
                 Log.d("ConnectAcitvity:","Device Connected");
                 Toast.makeText(Connect.this, "Connection Established: "+ myBTConnectionDevice.getName(),

@@ -49,6 +49,7 @@ public class BluetoothChat {
             tempIn = mySocket.getInputStream();
             tempOut = mySocket.getOutputStream();
         } catch (IOException e) {
+            Log.e(TAG, "IOException in startChat: ", e);
             e.printStackTrace();
         }
         myInputStream = tempIn;
@@ -74,7 +75,7 @@ public class BluetoothChat {
                 LocalBroadcastManager.getInstance(myContext).sendBroadcast(incomingMsgIntent);
 
             } catch (IOException e) {
-
+                Log.e(TAG, "IOException in startChat: ", e);
                 //BROADCAST CONNECTION MSG
                 Intent connectionStatusIntent = new Intent("btConnectionStatus");
                 connectionStatusIntent.putExtra("ConnectionStatus", "disconnect");
@@ -86,6 +87,7 @@ public class BluetoothChat {
                 break;
 
             } catch (Exception e){
+                Log.e(TAG, "General exception in startChat: ", e);
                 Log.d(TAG, "CHAT SERVICE: Closed 2!!!: "+ e);
                 e.printStackTrace();
 
@@ -130,7 +132,7 @@ public class BluetoothChat {
         myContext = context;
         //Start thread to manage the connection and perform transmissions
         startChat(mySocket);
-
+        Log.d(TAG, "Connected: Started");
 
     }
 
