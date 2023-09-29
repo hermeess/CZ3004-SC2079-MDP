@@ -146,5 +146,6 @@ class Robot:
                     total_time = round(total_time)
                 # Calculate time for all commands
                 # Then print it out.
+               
                 print(f"All commands took {datetime.timedelta(seconds=total_time)}")
                 self.printed = True

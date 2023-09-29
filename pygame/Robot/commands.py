@@ -112,9 +112,9 @@ class StraightCommand(Command):
         # Check if forward or backward.
         if descaled_distance < 0:
             # It is a backward command.
-            return f"STM|BC{abs(descaled_distance):03}"
+            return f"BW{abs(descaled_distance):03}"
         # Else, it is a forward command.
-        return f"STM|FC{descaled_distance:03}"
+        return f"FW{descaled_distance:03}"
 
 
 class TurnCommand(Command):
@@ -196,13 +196,13 @@ class TurnCommand(Command):
     def convert_to_message(self):
         if self.angle > 0 and not self.rev:
             # This is going forward left.
-            return "STM|FL090"  # Note the smaller case L.
+            return "FL090"  # Note the smaller case L.
         elif self.angle > 0 and self.rev:
             # This is going backward and with the wheels to the right.
-            return "STM|BR090"
+            return "BR090"
         elif self.angle < 0 and not self.rev:
             # This is going forward right.
-            return "STM|FR090"
+            return "FR090"
         else:
             # This is going backward and with the wheels to the left.
-            return "STM|BL090"
+            return "BL090"
