@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from model import *
+import importlib.util
+import sys
 
 app = Flask(__name__)
 CORS(app)
@@ -52,6 +54,15 @@ def combine():
     image = combine_image()
     image.show()
     return jsonify({"result": "ok"})
+
+@app.route('/algo', methods=['GET'])
+async def cal_path():
+    spec = importlib.util.spec_from_file_location("module.name", "/Users/jiaxi/Desktop/MDP/github/CZ3004-SC2079-MDP/pygame/main.py ")
+    foo = importlib.util.module_from_spec(spec)
+    sys.modules["module.name"] = foo
+    spec.loader.exec_module(foo)
+    await foo.main()
+    return 'NA'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
