@@ -197,7 +197,7 @@ class RaspberryPi:
                     # Commencing path following
                     if not self.command_queue.empty():
                         self.logger.info("Gryo reset!")
-                        self.stm_link.send("RS00")
+                        self.stm_link.send("RS000")
                         # Main trigger to start movement #
                         self.unpause.set()
                         self.logger.info(
@@ -223,7 +223,7 @@ class RaspberryPi:
             if message.startswith("ACK"):
                 if self.rs_flag == False:
                     self.rs_flag = True
-                    self.logger.debug("ACK for RS00 from STM32 received.")
+                    self.logger.debug("ACK for RS000 from STM32 received.")
                     continue
                 try:
                     self.movement_lock.release()
@@ -490,7 +490,7 @@ class RaspberryPi:
                 f"self.success_obstacles: {self.success_obstacles}")
         self.android_queue.put(AndroidMessage("image-rec", results))
 
-    def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
+    def request_algo(self, data, robot_x=0, robot_y=0, robot_dir=90, retrying=False):
         """
         Requests for a series of commands and the path from the Algo API.
         The received commands and path are then queued in the respective queues
