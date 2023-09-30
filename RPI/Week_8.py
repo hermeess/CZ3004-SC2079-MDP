@@ -172,6 +172,8 @@ class RaspberryPi:
             except OSError:
                 self.android_dropped.set()
                 self.logger.debug("Event set: Android connection dropped")
+                
+                break
 
             if msg_str is None:
                 continue
@@ -267,8 +269,11 @@ class RaspberryPi:
             try:
                 self.android_link.send(message)
             except OSError:
+                self.android_queue.put(message)
                 self.android_dropped.set()
                 self.logger.debug("Event set: Android dropped")
+
+                break
 
     def command_follower(self) -> None:
         """
@@ -488,7 +493,7 @@ class RaspberryPi:
                 self.obstacles[int(results['obstacle_id'])])
             self.logger.info(
                 f"self.success_obstacles: {self.success_obstacles}")
-        self.android_queue.put(AndroidMessage("image-rec", results))
+            self.android_queue.put(AndroidMessage("image-rec", results))
 
     def request_algo(self, data, robot_x=0, robot_y=0, robot_dir=90, retrying=False):
         """

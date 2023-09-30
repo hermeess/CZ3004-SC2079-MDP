@@ -171,6 +171,8 @@ class RaspberryPi:
                 self.android_dropped.set()
                 self.logger.debug("Event set: Android connection dropped")
 
+                break
+
             # If an error occurred in recv()
             if msg_str is None:
                 continue
@@ -281,8 +283,11 @@ class RaspberryPi:
             try:
                 self.android_link.send(message)
             except OSError:
+                self.android_queue.put(message)
                 self.android_dropped.set()
                 self.logger.debug("Event set: Android dropped")
+
+                break
 
     def command_follower(self) -> None:
         while True:
