@@ -12,7 +12,6 @@ from consts import SYMBOL_MAP
 from logger import prepare_logger
 from settings import API_IP, API_PORT
 
-
 class PiAction:
     """
     Class that represents an action that the RPi needs to take.    
@@ -33,7 +32,6 @@ class PiAction:
     @property
     def value(self):
         return self._value
-
 
 class RaspberryPi:
     """
@@ -172,7 +170,7 @@ class RaspberryPi:
             except OSError:
                 self.android_dropped.set()
                 self.logger.debug("Event set: Android connection dropped")
-                
+
                 break
 
             if msg_str is None:
@@ -470,13 +468,6 @@ class RaspberryPi:
                 self.logger.info("Recapturing with higher shutter speed...")
                 speed += 1
 
-        # release lock so that bot can continue moving
-        self.movement_lock.release()
-        try:
-            self.retrylock.release()
-        except:
-            pass
-
         self.logger.info(f"results: {results}")
         self.logger.info(f"self.obstacles: {self.obstacles}")
         self.logger.info(
@@ -494,6 +485,13 @@ class RaspberryPi:
             self.logger.info(
                 f"self.success_obstacles: {self.success_obstacles}")
             self.android_queue.put(AndroidMessage("image-rec", results))
+        
+        # release lock so that bot can continue moving
+        self.movement_lock.release()
+        try:
+            self.retrylock.release()
+        except:
+            pass
 
     def request_algo(self, data, robot_x=0, robot_y=0, robot_dir=90, retrying=False):
         """
