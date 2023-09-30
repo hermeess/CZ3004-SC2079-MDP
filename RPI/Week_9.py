@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import io
 import json
 import queue
 import time
 from multiprocessing import Process, Manager
+import picamera
 from typing import Optional
 import os
 import requests
