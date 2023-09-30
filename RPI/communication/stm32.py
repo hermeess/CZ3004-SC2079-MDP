@@ -66,5 +66,4 @@ class STMLink(Link):
             Optional[str]: message received
         """
         message = self.serial_link.read(5).strip().decode("utf-8")
-        self.logger.debug(f"Received from STM32: {message}")
         return message
