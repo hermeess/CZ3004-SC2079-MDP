@@ -60,7 +60,8 @@ class ScanCommand(Command):
     def convert_to_message(self):
         # Just return a string of s's
         # return f"S{self.obj_index:01}"
-        return "RPI|"
+
+        return f"SNAP{self.obj_index}_C"
 
 
 class StraightCommand(Command):

@@ -158,3 +158,20 @@ class AlgoSimulator(AlgoApp):
             self.do_updates() 
             # Render the new frame.
             self.render()
+        
+class AlgoMinimal(AlgoApp):
+    
+    #Minimal app to just calculate a path and then send the commands over.
+    
+    def __init__(self, obstacles):
+        super().__init__(obstacles)
+
+    def init(self):
+        pass
+
+    def execute(self):
+        print("Calculating path...")
+        index_list = self.robot.brain.plan_path()
+        return index_list
+
+   
