@@ -63,12 +63,15 @@ def main(simulator):
     forward = "FW020"
     reverseSecond = "BW010"
     forwardSecond = "FW030"
+    
+    """
     obst_list = [{"x":1,"y":18,"direction":-90,"obs_id":0},
                  {"x":16,"y":10,"direction":90,"obs_id":1},
                  {"x":12,"y":3,"direction":90,"obs_id":2},
                  {"x":18,"y":18,"direction":-90,"obs_id":3},
                  {"x":2,"y":8,"direction":-90,"obs_id":4},
                  {"x":5,"y":12,"direction":-90,"obs_id":5}]
+    """
     
     image_ids = ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20", 
                  "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
@@ -105,11 +108,11 @@ def main(simulator):
 
 
 
-    print("============================Parse Obstacles Data============================")
+   
     obstacles = parse_obstacle_data_cur(obst_list)
-    print(f"After parsing: {obstacles}")
+    
 
-    print("===============================Calculate path===============================")
+   
     if simulator == True:
         app = AlgoSimulator(obstacles)
         app.init()
@@ -117,8 +120,6 @@ def main(simulator):
     else:
         app = AlgoMinimal(obstacles)
         index_list = app.execute()
-        print("TEST")
-        print(index_list)
     commands = app.robot.convert_commands()
     commands.append("FIN")
     list_of_coor = app.robot.path_hist
@@ -130,24 +131,14 @@ def main(simulator):
         'path': list_of_coor
     }
     jsonObj = json.dumps(obj)
-    print(obj)
+   
 
-    print(jsonObj)
-
-    
-
-
-    print("Full list of paths commands till last obstacle:")
-    print(commands)
     roboPosCoor = {
         "x": 15,
         "y": 4,
         "direction" : "N"
     }
-    #print("TEST")
-    #print(list_of_coor)
-
-    print("=======================Send path commands to move to obstacles=======================")
+    
     
   
 
