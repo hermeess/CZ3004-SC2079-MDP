@@ -904,9 +904,9 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
 
     // Call this to update the target's image + cell background simultaneously.
     //>>Bluetooth to call this to update the target's background
-    private void updateTarget(String target, String obstacle_id) {
+
+    private void updateTarget(String target, String obstacleTag) {
         String targetTag = "obstacle_" + target;
-        String obstacleTag = "obstacle_" + obstacle_id;
         ImageView obstacleImageView = rootView.findViewWithTag(obstacleTag);
         ImageView targetImageView = new ImageView(requireContext());
 
@@ -1070,9 +1070,9 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         }
         JSONArray jsonArray = new JSONArray(list);
         JSONObject json = new JSONObject();
-        json.put("obstacle", jsonArray);
+        json.put("obstacles", jsonArray);
         JSONObject finalJson = new JSONObject();
-        finalJson.put("cat", "obstacle");
+        finalJson.put("cat", "obstacles");
         finalJson.put("value", json);
 
         //>>Bluetooth this is the object to send to RPi;
@@ -1318,7 +1318,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                     valueObj = mainObject.getJSONObject("value");
                     String image_id = valueObj.getString("image_id");
                     String obstacle_id = valueObj.getString("obstacle_id");
-                    updateTarget(image_id, obstacle_id);
+                    Log.d("Scanning images", "Obstacle_id value:" + obstacle_id);
+                    String obstacle_string = obstacleMap.keySet().toArray()[Integer.parseInt(obstacle_id)-1].toString();
+
+                    Log.d("Scanning images", obstacle_string + "this is the obstacle ID of images");
+                    updateTarget(image_id, obstacle_string);
                     break;
 
                 // Add other cases as needed
