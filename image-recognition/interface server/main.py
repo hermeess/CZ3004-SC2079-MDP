@@ -49,13 +49,13 @@ def image_rec():
 
     return jsonify(result)
 
-@app.route('/combine', methods=['GET'])
+@app.route('/stitch', methods=['GET'])
 def combine():
     image = combine_image()
     image.show()
     return jsonify({"result": "ok"})
 
-@app.route('/algo', methods=['GET'])
+@app.route('/path', methods=['POST'])
 async def cal_path():
     spec = importlib.util.spec_from_file_location("module.name", "/Users/jiaxi/Desktop/MDP/github/CZ3004-SC2079-MDP/pygame/main.py ")
     foo = importlib.util.module_from_spec(spec)
