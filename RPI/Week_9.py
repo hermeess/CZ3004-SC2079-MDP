@@ -187,7 +187,6 @@ class RaspberryPi:
                         self.logger.error("API is down! Start command aborted.")
 
                     self.clear_queues()
-                    self.command_queue.put("RS000") # ack_count = 1
                     
                     # Small object direction detection
                     self.small_direction = self.snap_and_rec("Small")

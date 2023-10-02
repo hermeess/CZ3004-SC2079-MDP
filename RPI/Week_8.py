@@ -202,7 +202,6 @@ class RaspberryPi:
                         self.unpause.set()
                         self.logger.info(
                             "Start command received, starting robot on path!")
-                        
                         self.android_queue.put(AndroidMessage(
                             'info', 'Starting robot on path!'))
                         self.android_queue.put(
