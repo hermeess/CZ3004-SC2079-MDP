@@ -44,8 +44,8 @@ def parse_obstacle_data_cur(data) -> List[Obstacle]:
     for obstacle_params in lst3:
         obs.append(Obstacle(obstacle_params[0],
                             obstacle_params[1],
-                            Direction(obstacle_params[3]),
-                            obstacle_params[2]))
+                            Direction(obstacle_params[2]),
+                            obstacle_params[3]))
 
     # [[x, y, orient, index], [x, y, orient, index]]
     return obs 
@@ -120,7 +120,8 @@ def mainAlgoFunc(simulator, obst_list):
         index_list = app.execute()
     commands = app.robot.convert_commands()
     commands.append("FIN")
-    list_of_coor = app.robot.path_hist
+   # list_of_coor = app.robot.path_hist
+    list_of_coor = [{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2},{"d":90,"x":1,"y":2}]
     
     
     obj = {}
@@ -128,8 +129,6 @@ def mainAlgoFunc(simulator, obst_list):
         'commands': commands,
         'path': list_of_coor
     }
-    jsonObj = json.dumps(obj)
-   
 
     roboPosCoor = {
         "x": 15,
@@ -137,18 +136,5 @@ def mainAlgoFunc(simulator, obst_list):
         "direction" : "N"
     }
     
-    return jsonObj
+    return obj
     
-  
-
-
-# if __name__ == '__main__':
-#     mainAlgoFunc(True)
-"""
-obstacles = parse_obstacle_data_cur(old_obstacles)
-app = AlgoSimulator(obstacles)
-app.init()
-app.execute()
-
-"""
-
