@@ -3,6 +3,7 @@ from flask_cors import CORS
 from model import *
 import importlib.util
 import sys
+from mainAlgo2 import *
 
 app = Flask(__name__)
 CORS(app)
@@ -56,13 +57,19 @@ def combine():
     return jsonify({"result": "ok"})
 
 @app.route('/path', methods=['POST'])
-async def cal_path():
-    spec = importlib.util.spec_from_file_location("module.name", "/Users/jiaxi/Desktop/MDP/github/CZ3004-SC2079-MDP/pygame/main.py ")
-    foo = importlib.util.module_from_spec(spec)
-    sys.modules["module.name"] = foo
-    spec.loader.exec_module(foo)
-    await foo.main()
-    return 'NA'
+def cal_path():
+    # spec = importlib.util.spec_from_file_location("module.name", "/Users/jiaxi/Desktop/MDP/github/CZ3004-SC2079-MDP/pygame/main.py ")
+    # foo = importlib.util.module_from_spec(spec)
+    # sys.modules["module.name"] = foo
+    # spec.loader.exec_module(foo)
+
+    print('request.body: ', request.get_json())
+    obst_list = request.get_json()['obstacles']
+    # print('obst_list: ', obst_list)
+
+    result = mainAlgoFunc(True, obst_list)
+
+    return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5007, debug=True)

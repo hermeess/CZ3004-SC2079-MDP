@@ -6,8 +6,6 @@ from Map import *
 from simulator import AlgoSimulator, AlgoMinimal
 from settings import *
 
-
-
 start_img = pygame.image.load("assets/jasontheween.png").convert_alpha()
 exit_img = pygame.image.load("assets/jasontheween.png").convert_alpha()
 reset_img = pygame.image.load("assets/jasontheween.png").convert_alpha()
@@ -46,14 +44,14 @@ def parse_obstacle_data_cur(data) -> List[Obstacle]:
     for obstacle_params in lst3:
         obs.append(Obstacle(obstacle_params[0],
                             obstacle_params[1],
-                            Direction(obstacle_params[2]),
-                            obstacle_params[3]))
+                            Direction(obstacle_params[3]),
+                            obstacle_params[2]))
 
     # [[x, y, orient, index], [x, y, orient, index]]
     return obs 
      
 
-def main(simulator):
+def mainAlgoFunc(simulator, obst_list):
    # simulator: Pass in True to show simulator screen
     
     index = 0
@@ -139,12 +137,13 @@ def main(simulator):
         "direction" : "N"
     }
     
+    return jsonObj
     
   
 
 
-if __name__ == '__main__':
-    main(True)
+# if __name__ == '__main__':
+#     mainAlgoFunc(True)
 """
 obstacles = parse_obstacle_data_cur(old_obstacles)
 app = AlgoSimulator(obstacles)
