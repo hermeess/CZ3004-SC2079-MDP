@@ -1,0 +1,496 @@
+2023-09-15 08:14:59,824 :: INFO :: Bluetooth connection started
+2023-09-15 08:14:59,860 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:16:03,739 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:16:03,753 :: INFO :: Connected to STM32
+2023-09-15 08:16:03,817 :: DEBUG :: API is up!
+2023-09-15 08:16:03,844 :: INFO :: Child Processes started
+2023-09-15 08:16:03,853 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:16:03,922 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:16:03,924 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:16:11,670 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:16:11,672 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:16:11,750 :: DEBUG :: API is up!
+2023-09-15 08:16:11,756 :: WARNING :: The command queue is empty, please set obstacles.
+2023-09-15 08:16:11,760 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Command queue is empty, did you set obstacles?"}
+2023-09-15 08:16:56,642 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:16:56,643 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:16:56,726 :: DEBUG :: API is up!
+2023-09-15 08:16:56,728 :: WARNING :: The command queue is empty, please set obstacles.
+2023-09-15 08:16:56,731 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Command queue is empty, did you set obstacles?"}
+2023-09-15 08:17:12,143 :: DEBUG :: b'{"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-1,"id":1}]}}'
+2023-09-15 08:17:12,144 :: DEBUG :: Received from Android: {"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-1,"id":1}]}}
+2023-09-15 08:17:47,143 :: DEBUG :: b'{"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:17:47,144 :: DEBUG :: Received from Android: {"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:18:54,211 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:18:54,214 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:18:54,215 :: INFO :: Disconnected from STM32
+2023-09-15 08:18:54,216 :: INFO :: Program exited!
+2023-09-15 08:21:40,297 :: INFO :: Bluetooth connection started
+2023-09-15 08:21:40,334 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:21:44,338 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:21:44,339 :: ERROR :: Failed to disconnect Bluetooth link: 'NoneType' object has no attribute 'shutdown'
+2023-09-15 08:22:08,331 :: INFO :: Bluetooth connection started
+2023-09-15 08:22:08,364 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:22:36,562 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:22:36,575 :: INFO :: Connected to STM32
+2023-09-15 08:22:36,630 :: DEBUG :: API is up!
+2023-09-15 08:22:36,657 :: INFO :: Child Processes started
+2023-09-15 08:22:36,664 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:22:36,733 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:22:36,735 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:23:07,531 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:23:07,533 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:23:07,674 :: DEBUG :: API is up!
+2023-09-15 08:23:07,676 :: WARNING :: The command queue is empty, please set obstacles.
+2023-09-15 08:23:07,679 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Command queue is empty, did you set obstacles?"}
+2023-09-15 08:23:23,148 :: DEBUG :: b'{"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:23:23,149 :: DEBUG :: Received from Android: {"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:24:40,148 :: ERROR :: Error receiving message from Android: (104, 'Connection reset by peer')
+2023-09-15 08:24:40,150 :: DEBUG :: Event set: Android connection dropped
+2023-09-15 08:24:40,150 :: ERROR :: Android link is down!
+2023-09-15 08:24:40,151 :: DEBUG :: Killing android child processes
+2023-09-15 08:24:40,161 :: DEBUG :: Android child processes killed
+2023-09-15 08:24:40,162 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:24:40,163 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:24:40,164 :: INFO :: Bluetooth connection started
+2023-09-15 08:24:40,214 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:24:48,111 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:24:48,112 :: ERROR :: Failed to disconnect Bluetooth link: 'NoneType' object has no attribute 'shutdown'
+2023-09-15 08:24:48,113 :: INFO :: Disconnected from STM32
+2023-09-15 08:24:48,114 :: INFO :: Program exited!
+2023-09-15 08:24:50,623 :: INFO :: Bluetooth connection started
+2023-09-15 08:24:50,661 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:25:20,435 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:25:20,454 :: INFO :: Connected to STM32
+2023-09-15 08:25:20,595 :: DEBUG :: API is up!
+2023-09-15 08:25:20,621 :: INFO :: Child Processes started
+2023-09-15 08:25:20,626 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:25:20,714 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:25:20,716 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:25:45,720 :: DEBUG :: b'{"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:25:45,721 :: DEBUG :: Received from Android: {"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:25:48,526 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:25:48,527 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:25:48,566 :: DEBUG :: API is up!
+2023-09-15 08:25:48,570 :: WARNING :: The command queue is empty, please set obstacles.
+2023-09-15 08:25:48,572 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Command queue is empty, did you set obstacles?"}
+2023-09-15 08:27:50,666 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:27:50,667 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:27:50,669 :: INFO :: Disconnected from STM32
+2023-09-15 08:27:50,669 :: INFO :: Program exited!
+2023-09-15 08:27:53,580 :: INFO :: Bluetooth connection started
+2023-09-15 08:27:53,615 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:28:09,571 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:28:09,593 :: INFO :: Connected to STM32
+2023-09-15 08:28:09,698 :: DEBUG :: API is up!
+2023-09-15 08:28:09,727 :: INFO :: Child Processes started
+2023-09-15 08:28:09,731 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:28:09,798 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:28:09,800 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:28:09,815 :: ERROR :: Error receiving message from Android: (104, 'Connection reset by peer')
+2023-09-15 08:28:09,818 :: ERROR :: Android link is down!
+2023-09-15 08:28:09,818 :: DEBUG :: Killing android child processes
+2023-09-15 08:28:09,822 :: DEBUG :: Android child processes killed
+2023-09-15 08:28:09,822 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:28:09,823 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:28:09,823 :: INFO :: Bluetooth connection started
+2023-09-15 08:28:09,853 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:28:20,897 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:28:20,917 :: INFO :: Android child processes restarted
+2023-09-15 08:28:21,000 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are reconnected!"}
+2023-09-15 08:28:47,301 :: DEBUG :: b'{"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:28:47,303 :: DEBUG :: Received from Android: {"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:28:47,310 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacle', 'value': {'obstacle': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:28:47,314 :: DEBUG :: PiAction retrieved from queue: obstacle {'obstacle': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:28:54,653 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:28:54,654 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:28:54,741 :: DEBUG :: API is up!
+2023-09-15 08:28:54,743 :: WARNING :: The command queue is empty, please set obstacles.
+2023-09-15 08:28:54,746 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Command queue is empty, did you set obstacles?"}
+2023-09-15 08:30:02,153 :: ERROR :: Error receiving message from Android: (104, 'Connection reset by peer')
+2023-09-15 08:30:02,155 :: DEBUG :: Event set: Android connection dropped
+2023-09-15 08:30:02,156 :: ERROR :: Android link is down!
+2023-09-15 08:30:02,157 :: DEBUG :: Killing android child processes
+2023-09-15 08:30:02,165 :: DEBUG :: Android child processes killed
+2023-09-15 08:30:02,166 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:30:02,167 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:30:02,168 :: INFO :: Bluetooth connection started
+2023-09-15 08:30:02,222 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:30:05,993 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:30:05,994 :: ERROR :: Failed to disconnect Bluetooth link: 'NoneType' object has no attribute 'shutdown'
+2023-09-15 08:30:05,996 :: INFO :: Disconnected from STM32
+2023-09-15 08:30:05,997 :: INFO :: Program exited!
+2023-09-15 08:30:12,127 :: INFO :: Bluetooth connection started
+2023-09-15 08:30:12,157 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:30:23,908 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:30:23,930 :: INFO :: Connected to STM32
+2023-09-15 08:30:23,986 :: DEBUG :: API is up!
+2023-09-15 08:30:24,059 :: INFO :: Child Processes started
+2023-09-15 08:30:24,065 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:30:24,145 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:30:24,146 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:30:47,397 :: DEBUG :: b'{"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:30:47,399 :: DEBUG :: Received from Android: {"cat":"obstacle","value":{"obstacle":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:30:47,408 :: DEBUG :: PiAction retrieved from queue: obstacle {'obstacle': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:30:47,411 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacle', 'value': {'obstacle': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:30:47,412 :: INFO :: Requesting path from algo...
+2023-09-15 08:30:47,415 :: INFO :: data: {'obstacle': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:30:47,423 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 08:30:47,567 :: ERROR :: Something went wrong when requesting path from Algo API.
+2023-09-15 08:30:47,567 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Something went wrong when requesting path from Algo API."}
+2023-09-15 08:34:04,656 :: ERROR :: Error receiving message from Android: (104, 'Connection reset by peer')
+2023-09-15 08:34:04,658 :: DEBUG :: Event set: Android connection dropped
+2023-09-15 08:34:04,658 :: ERROR :: Android link is down!
+2023-09-15 08:34:04,659 :: DEBUG :: Killing android child processes
+2023-09-15 08:34:04,667 :: DEBUG :: Android child processes killed
+2023-09-15 08:34:04,668 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:34:04,669 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:34:04,669 :: INFO :: Bluetooth connection started
+2023-09-15 08:34:04,724 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:39:07,994 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:39:07,995 :: ERROR :: Failed to disconnect Bluetooth link: 'NoneType' object has no attribute 'shutdown'
+2023-09-15 08:39:07,996 :: INFO :: Disconnected from STM32
+2023-09-15 08:39:07,998 :: INFO :: Program exited!
+2023-09-15 08:39:14,116 :: INFO :: Bluetooth connection started
+2023-09-15 08:39:14,153 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:39:32,883 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:39:32,899 :: INFO :: Connected to STM32
+2023-09-15 08:39:32,943 :: DEBUG :: API is up!
+2023-09-15 08:39:32,972 :: INFO :: Child Processes started
+2023-09-15 08:39:32,986 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:39:33,087 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:39:33,092 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:40:03,216 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:40:03,218 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:40:03,230 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:40:03,233 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:40:03,242 :: INFO :: Requesting path from algo...
+2023-09-15 08:40:03,244 :: INFO :: data: {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:40:03,245 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 08:40:03,321 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Something went wrong when requesting path from Algo API."}
+2023-09-15 08:40:03,321 :: ERROR :: Something went wrong when requesting path from Algo API.
+2023-09-15 08:41:34,163 :: ERROR :: Error receiving message from Android: (104, 'Connection reset by peer')
+2023-09-15 08:41:34,165 :: DEBUG :: Event set: Android connection dropped
+2023-09-15 08:41:34,165 :: ERROR :: Android link is down!
+2023-09-15 08:41:34,166 :: DEBUG :: Killing android child processes
+2023-09-15 08:41:34,185 :: DEBUG :: Android child processes killed
+2023-09-15 08:41:34,186 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:41:34,186 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:41:34,187 :: INFO :: Bluetooth connection started
+2023-09-15 08:41:34,241 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:41:48,756 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:41:48,757 :: ERROR :: Failed to disconnect Bluetooth link: 'NoneType' object has no attribute 'shutdown'
+2023-09-15 08:41:48,758 :: INFO :: Disconnected from STM32
+2023-09-15 08:41:48,759 :: INFO :: Program exited!
+2023-09-15 08:41:52,113 :: INFO :: Bluetooth connection started
+2023-09-15 08:41:52,148 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:42:05,314 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:42:05,337 :: INFO :: Connected to STM32
+2023-09-15 08:42:05,399 :: DEBUG :: API is up!
+2023-09-15 08:42:05,451 :: INFO :: Child Processes started
+2023-09-15 08:42:05,460 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:42:05,539 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:42:05,542 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:42:24,557 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:42:24,559 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:42:24,567 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:42:24,570 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:42:24,573 :: INFO :: Requesting path from algo...
+2023-09-15 08:42:24,577 :: INFO :: data: {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:42:24,577 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 08:43:46,118 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:43:46,121 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:43:46,124 :: INFO :: Disconnected from STM32
+2023-09-15 08:43:46,125 :: INFO :: Program exited!
+2023-09-15 08:44:01,281 :: INFO :: Bluetooth connection started
+2023-09-15 08:44:01,320 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:44:17,390 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:44:17,416 :: INFO :: Connected to STM32
+2023-09-15 08:44:17,601 :: DEBUG :: API is up!
+2023-09-15 08:44:17,629 :: INFO :: Child Processes started
+2023-09-15 08:44:17,634 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:44:17,725 :: ERROR :: Error sending message to Android: (104, 'Connection reset by peer')
+2023-09-15 08:44:17,727 :: ERROR :: Android link is down!
+2023-09-15 08:44:17,728 :: DEBUG :: Killing android child processes
+2023-09-15 08:44:17,735 :: DEBUG :: Android child processes killed
+2023-09-15 08:44:17,736 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:44:17,736 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:44:17,737 :: INFO :: Bluetooth connection started
+2023-09-15 08:44:17,766 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:44:26,014 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:44:26,025 :: INFO :: Android child processes restarted
+2023-09-15 08:44:26,075 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:44:26,079 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:44:26,082 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are reconnected!"}
+2023-09-15 08:45:03,741 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:45:03,743 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:45:03,750 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:45:03,756 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:45:03,760 :: INFO :: Requesting path from algo...
+2023-09-15 08:45:03,762 :: INFO :: data: {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:45:03,763 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 08:47:36,546 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:47:36,548 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:47:36,550 :: INFO :: Disconnected from STM32
+2023-09-15 08:47:36,551 :: INFO :: Program exited!
+2023-09-15 08:47:48,966 :: INFO :: Bluetooth connection started
+2023-09-15 08:47:49,002 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:47:58,643 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:47:58,664 :: INFO :: Connected to STM32
+2023-09-15 08:47:58,731 :: DEBUG :: API is up!
+2023-09-15 08:47:58,761 :: INFO :: Child Processes started
+2023-09-15 08:47:58,777 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:47:58,868 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:47:58,869 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:48:17,501 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:48:17,503 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:48:17,510 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:48:17,514 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:48:17,518 :: INFO :: Requesting path from algo...
+2023-09-15 08:48:17,521 :: INFO :: data: {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:48:17,522 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 08:48:17,899 :: DEBUG :: Commands received from API: ['FW010', 'FR090', 'FW020', 'FL090', 'BW020', 'SNAP1_C', 'FIN']
+2023-09-15 08:48:17,901 :: DEBUG :: wait for unpause
+2023-09-15 08:48:17,902 :: DEBUG :: wait for retrylock
+2023-09-15 08:48:17,902 :: DEBUG :: wait for unpause
+2023-09-15 08:48:17,910 :: INFO :: Commands and path received Algo API. Robot is ready to move.
+2023-09-15 08:48:17,910 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Commands and path received Algo API. Robot is ready to move."}
+2023-09-15 08:48:24,170 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:48:24,171 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:48:24,751 :: DEBUG :: API is up!
+2023-09-15 08:48:24,752 :: INFO :: Gryo reset!
+2023-09-15 08:48:24,753 :: DEBUG :: Sent to STM32: RS000
+2023-09-15 08:48:24,753 :: INFO :: Start command received, starting robot on path!
+2023-09-15 08:48:24,753 :: DEBUG :: wait for movelock
+2023-09-15 08:48:24,754 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Starting robot on path!"}
+2023-09-15 08:48:24,755 :: DEBUG :: Sent to STM32: FW010
+2023-09-15 08:48:24,755 :: DEBUG :: Sending to STM32: FW010
+2023-09-15 08:48:24,755 :: DEBUG :: Sent to Android: {"cat": "info", "value": "running"}
+2023-09-15 08:48:24,756 :: DEBUG :: wait for unpause
+2023-09-15 08:48:24,756 :: DEBUG :: wait for retrylock
+2023-09-15 08:48:24,756 :: DEBUG :: wait for unpause
+2023-09-15 08:48:24,757 :: DEBUG :: wait for movelock
+2023-09-15 08:48:26,174 :: DEBUG :: ACK for RS000 from STM32 received.
+2023-09-15 08:54:27,675 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:54:27,676 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:54:28,341 :: DEBUG :: API is up!
+2023-09-15 08:54:28,341 :: INFO :: Gryo reset!
+2023-09-15 08:54:28,342 :: DEBUG :: Sent to STM32: RS000
+2023-09-15 08:54:28,342 :: INFO :: Start command received, starting robot on path!
+2023-09-15 08:54:28,344 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Starting robot on path!"}
+2023-09-15 08:54:28,345 :: DEBUG :: Sent to Android: {"cat": "info", "value": "running"}
+2023-09-15 08:54:28,457 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 08:54:28,458 :: DEBUG :: Sent to STM32: FR090
+2023-09-15 08:54:28,458 :: DEBUG :: Sending to STM32: FR090
+2023-09-15 08:54:28,458 :: DEBUG :: wait for unpause
+2023-09-15 08:54:28,459 :: DEBUG :: wait for retrylock
+2023-09-15 08:54:28,459 :: DEBUG :: wait for unpause
+2023-09-15 08:54:28,459 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 08:54:28,460 :: DEBUG :: wait for movelock
+2023-09-15 08:54:28,461 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 08:54:53,414 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 08:54:53,415 :: DEBUG :: Sent to STM32: FW020
+2023-09-15 08:54:53,415 :: DEBUG :: Sending to STM32: FW020
+2023-09-15 08:54:53,417 :: DEBUG :: wait for unpause
+2023-09-15 08:54:53,418 :: DEBUG :: wait for retrylock
+2023-09-15 08:54:53,418 :: DEBUG :: wait for unpause
+2023-09-15 08:54:53,418 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 08:54:53,420 :: DEBUG :: wait for movelock
+2023-09-15 08:54:53,421 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 08:54:54,874 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 08:54:54,875 :: DEBUG :: Sent to STM32: FL090
+2023-09-15 08:54:54,875 :: DEBUG :: Sending to STM32: FL090
+2023-09-15 08:54:54,876 :: DEBUG :: wait for unpause
+2023-09-15 08:54:54,877 :: DEBUG :: wait for retrylock
+2023-09-15 08:54:54,878 :: DEBUG :: wait for unpause
+2023-09-15 08:54:54,878 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 08:54:54,879 :: DEBUG :: wait for movelock
+2023-09-15 08:54:54,880 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 08:55:04,348 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 08:55:04,349 :: DEBUG :: Sent to STM32: BW020
+2023-09-15 08:55:04,350 :: DEBUG :: Sending to STM32: BW020
+2023-09-15 08:55:04,352 :: DEBUG :: wait for unpause
+2023-09-15 08:55:04,353 :: DEBUG :: wait for retrylock
+2023-09-15 08:55:04,353 :: DEBUG :: wait for unpause
+2023-09-15 08:55:04,354 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 08:55:04,355 :: DEBUG :: wait for movelock
+2023-09-15 08:55:04,357 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 08:55:04,594 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 08:55:04,595 :: DEBUG :: PiAction retrieved from queue: snap 1_C
+2023-09-15 08:55:04,595 :: INFO :: Capturing image for obstacle id: 1
+2023-09-15 08:55:04,596 :: DEBUG :: wait for unpause
+2023-09-15 08:55:04,597 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Capturing image for obstacle id: 1"}
+2023-09-15 08:55:04,597 :: DEBUG :: wait for retrylock
+2023-09-15 08:55:04,598 :: DEBUG :: wait for unpause
+2023-09-15 08:55:04,599 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 08:55:04,599 :: DEBUG :: wait for movelock
+2023-09-15 08:55:04,600 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 08:55:07,302 :: DEBUG :: Requesting from image API
+2023-09-15 08:55:08,291 :: INFO :: results: {'image_id': 'NA', 'obstacle_id': '1'}
+2023-09-15 08:55:08,292 :: INFO :: self.obstacles: {1: {'x': 9, 'y': 9, 'd': -90, 'id': 1}}
+2023-09-15 08:55:08,293 :: INFO :: Image recognition results: {'image_id': 'NA', 'obstacle_id': '1'} (None)
+2023-09-15 08:55:08,295 :: INFO :: Added Obstacle 1 to failed obstacles.
+2023-09-15 08:55:08,296 :: INFO :: self.failed_obstacles: [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]
+2023-09-15 08:55:08,298 :: INFO :: At FIN, self.failed_obstacles: [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]
+2023-09-15 08:55:08,300 :: INFO :: At FIN, self.current_location: {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 08:55:08,305 :: INFO :: Commands queue finished.
+2023-09-15 08:55:08,308 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Commands queue finished."}
+2023-09-15 08:55:08,310 :: DEBUG :: PiAction retrieved from queue: stitch 
+2023-09-15 08:55:08,311 :: DEBUG :: Sent to Android: {"cat": "info", "value": "finished"}
+2023-09-15 08:55:08,435 :: ERROR :: Something went wrong when requesting stitch from the API.
+2023-09-15 08:55:08,435 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Something went wrong when requesting stitch from the API."}
+2023-09-15 08:56:03,676 :: ERROR :: Error receiving message from Android: (104, 'Connection reset by peer')
+2023-09-15 08:56:03,677 :: DEBUG :: Event set: Android connection dropped
+2023-09-15 08:56:03,678 :: ERROR :: Android link is down!
+2023-09-15 08:56:03,679 :: DEBUG :: Killing android child processes
+2023-09-15 08:56:03,697 :: DEBUG :: Android child processes killed
+2023-09-15 08:56:03,698 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:56:03,699 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:56:03,700 :: INFO :: Bluetooth connection started
+2023-09-15 08:56:03,755 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:57:32,757 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:57:32,760 :: ERROR :: Failed to disconnect Bluetooth link: 'NoneType' object has no attribute 'shutdown'
+2023-09-15 08:57:32,761 :: INFO :: Disconnected from STM32
+2023-09-15 08:57:32,762 :: INFO :: Program exited!
+2023-09-15 08:57:38,867 :: INFO :: Bluetooth connection started
+2023-09-15 08:57:38,905 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 08:57:48,861 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 08:57:48,881 :: INFO :: Connected to STM32
+2023-09-15 08:57:48,933 :: DEBUG :: API is up!
+2023-09-15 08:57:48,962 :: INFO :: Child Processes started
+2023-09-15 08:57:48,976 :: INFO :: Reconnection handler is watching...
+2023-09-15 08:57:49,058 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 08:57:49,060 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 08:58:09,986 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 08:58:09,988 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 08:58:09,997 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:58:09,995 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 08:58:10,006 :: INFO :: Requesting path from algo...
+2023-09-15 08:58:10,010 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 08:58:10,012 :: INFO :: data: {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 08:58:10,576 :: DEBUG :: Commands received from API: ['FW010', 'FR090', 'FW020', 'FL090', 'BW020', 'SNAP1_C', 'FIN']
+2023-09-15 08:58:10,578 :: DEBUG :: wait for unpause
+2023-09-15 08:58:10,578 :: DEBUG :: wait for retrylock
+2023-09-15 08:58:10,579 :: DEBUG :: wait for unpause
+2023-09-15 08:58:10,587 :: INFO :: Commands and path received Algo API. Robot is ready to move.
+2023-09-15 08:58:10,587 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Commands and path received Algo API. Robot is ready to move."}
+2023-09-15 08:58:14,908 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 08:58:14,909 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 08:58:14,958 :: DEBUG :: API is up!
+2023-09-15 08:58:14,959 :: INFO :: Gryo reset!
+2023-09-15 08:58:14,961 :: DEBUG :: wait for movelock
+2023-09-15 08:58:14,961 :: INFO :: Start command received, starting robot on path!
+2023-09-15 08:58:14,964 :: DEBUG :: Sent to STM32: FW010
+2023-09-15 08:58:14,965 :: DEBUG :: Sending to STM32: FW010
+2023-09-15 08:58:14,966 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Starting robot on path!"}
+2023-09-15 08:58:14,967 :: DEBUG :: wait for unpause
+2023-09-15 08:58:14,968 :: DEBUG :: Sent to Android: {"cat": "info", "value": "running"}
+2023-09-15 08:58:14,968 :: DEBUG :: wait for retrylock
+2023-09-15 08:58:14,970 :: DEBUG :: wait for unpause
+2023-09-15 08:58:14,971 :: DEBUG :: wait for movelock
+2023-09-15 08:58:15,903 :: DEBUG :: ACK for RS000 from STM32 received.
+2023-09-15 08:59:30,250 :: DEBUG :: Disconnecting Bluetooth link
+2023-09-15 08:59:30,254 :: INFO :: Disconnected Bluetooth link
+2023-09-15 08:59:30,256 :: INFO :: Disconnected from STM32
+2023-09-15 08:59:30,257 :: INFO :: Program exited!
+2023-09-15 08:59:42,330 :: INFO :: Bluetooth connection started
+2023-09-15 08:59:42,362 :: INFO :: Awaiting Bluetooth connection on RFCOMM CHANNEL 1
+2023-09-15 09:00:01,725 :: INFO :: Accepted connection from: ('48:61:EE:2A:AA:66', 1)
+2023-09-15 09:00:01,746 :: INFO :: Connected to STM32
+2023-09-15 09:00:01,911 :: DEBUG :: API is up!
+2023-09-15 09:00:01,937 :: INFO :: Child Processes started
+2023-09-15 09:00:01,948 :: INFO :: Reconnection handler is watching...
+2023-09-15 09:00:02,040 :: DEBUG :: Sent to Android: {"cat": "info", "value": "You are connected to the RPi!"}
+2023-09-15 09:00:02,042 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Robot is ready!"}
+2023-09-15 09:00:23,275 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 09:00:23,277 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 09:00:23,491 :: DEBUG :: API is up!
+2023-09-15 09:00:23,494 :: WARNING :: The command queue is empty, please set obstacles.
+2023-09-15 09:00:23,496 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Command queue is empty, did you set obstacles?"}
+2023-09-15 09:00:25,426 :: DEBUG :: b'{"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}'
+2023-09-15 09:00:25,427 :: DEBUG :: Received from Android: {"cat":"obstacles","value":{"obstacles":[{"x":9,"y":9,"d":-90,"id":1}]}}
+2023-09-15 09:00:25,430 :: DEBUG :: Set obstacles PiAction added to queue: {'cat': 'obstacles', 'value': {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}}
+2023-09-15 09:00:25,432 :: DEBUG :: PiAction retrieved from queue: obstacles {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 09:00:25,435 :: INFO :: Requesting path from algo...
+2023-09-15 09:00:25,444 :: INFO :: data: {'obstacles': [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]}
+2023-09-15 09:00:25,446 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Requesting path from algo..."}
+2023-09-15 09:00:25,816 :: DEBUG :: Commands received from API: ['FW010', 'FR090', 'FW020', 'FL090', 'BW020', 'SNAP1_C', 'FIN']
+2023-09-15 09:00:25,819 :: DEBUG :: wait for unpause
+2023-09-15 09:00:25,822 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:25,822 :: DEBUG :: wait for unpause
+2023-09-15 09:00:25,849 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Commands and path received Algo API. Robot is ready to move."}
+2023-09-15 09:00:25,850 :: INFO :: Commands and path received Algo API. Robot is ready to move.
+2023-09-15 09:00:29,229 :: DEBUG :: b'{"cat":"control","value":"start"}'
+2023-09-15 09:00:29,230 :: DEBUG :: Received from Android: {"cat":"control","value":"start"}
+2023-09-15 09:00:29,257 :: DEBUG :: API is up!
+2023-09-15 09:00:29,258 :: INFO :: Gryo reset!
+2023-09-15 09:00:29,260 :: INFO :: Start command received, starting robot on path!
+2023-09-15 09:00:29,260 :: DEBUG :: wait for movelock
+2023-09-15 09:00:29,262 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Starting robot on path!"}
+2023-09-15 09:00:29,264 :: DEBUG :: Sent to Android: {"cat": "info", "value": "running"}
+2023-09-15 09:00:29,264 :: DEBUG :: Sent to STM32: FW010
+2023-09-15 09:00:29,265 :: DEBUG :: Sending to STM32: FW010
+2023-09-15 09:00:29,267 :: DEBUG :: wait for unpause
+2023-09-15 09:00:29,268 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:29,269 :: DEBUG :: wait for unpause
+2023-09-15 09:00:29,271 :: DEBUG :: wait for movelock
+2023-09-15 09:00:30,314 :: DEBUG :: Sent to STM32: FR090
+2023-09-15 09:00:30,315 :: DEBUG :: Sending to STM32: FR090
+2023-09-15 09:00:30,315 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 09:00:30,317 :: DEBUG :: wait for unpause
+2023-09-15 09:00:30,317 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:30,318 :: DEBUG :: wait for unpause
+2023-09-15 09:00:30,319 :: DEBUG :: wait for movelock
+2023-09-15 09:00:30,319 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 09:00:30,322 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 09:00:34,255 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 09:00:34,256 :: DEBUG :: Sent to STM32: FW020
+2023-09-15 09:00:34,256 :: DEBUG :: Sending to STM32: FW020
+2023-09-15 09:00:34,257 :: DEBUG :: wait for unpause
+2023-09-15 09:00:34,258 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:34,259 :: DEBUG :: wait for unpause
+2023-09-15 09:00:34,259 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 09:00:34,260 :: DEBUG :: wait for movelock
+2023-09-15 09:00:34,261 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 09:00:35,776 :: DEBUG :: Sent to STM32: FL090
+2023-09-15 09:00:35,776 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 09:00:35,776 :: DEBUG :: Sending to STM32: FL090
+2023-09-15 09:00:35,778 :: DEBUG :: wait for unpause
+2023-09-15 09:00:35,778 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:35,779 :: DEBUG :: wait for unpause
+2023-09-15 09:00:35,779 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 09:00:35,780 :: DEBUG :: wait for movelock
+2023-09-15 09:00:35,782 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 09:00:39,268 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 09:00:39,269 :: DEBUG :: Sent to STM32: BW020
+2023-09-15 09:00:39,269 :: DEBUG :: Sending to STM32: BW020
+2023-09-15 09:00:39,271 :: DEBUG :: wait for unpause
+2023-09-15 09:00:39,271 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:39,272 :: DEBUG :: wait for unpause
+2023-09-15 09:00:39,272 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 09:00:39,273 :: DEBUG :: wait for movelock
+2023-09-15 09:00:39,274 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 09:00:39,864 :: DEBUG :: PiAction retrieved from queue: snap 1_C
+2023-09-15 09:00:39,864 :: DEBUG :: wait for unpause
+2023-09-15 09:00:39,863 :: DEBUG :: ACK from STM32 received, movement lock released.
+2023-09-15 09:00:39,865 :: INFO :: Capturing image for obstacle id: 1
+2023-09-15 09:00:39,865 :: DEBUG :: wait for retrylock
+2023-09-15 09:00:39,866 :: DEBUG :: wait for unpause
+2023-09-15 09:00:39,868 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Capturing image for obstacle id: 1"}
+2023-09-15 09:00:39,869 :: DEBUG :: wait for movelock
+2023-09-15 09:00:39,877 :: INFO :: self.current_location = {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 09:00:39,880 :: DEBUG :: Sent to Android: {"cat": "location", "value": {"x": 1, "y": 2, "d": 90}}
+2023-09-15 09:00:42,348 :: DEBUG :: Requesting from image API
+2023-09-15 09:00:42,787 :: INFO :: results: {'image_id': '29', 'obstacle_id': '1'}
+2023-09-15 09:00:42,789 :: INFO :: self.obstacles: {1: {'x': 9, 'y': 9, 'd': -90, 'id': 1}}
+2023-09-15 09:00:42,790 :: INFO :: Image recognition results: {'image_id': '29', 'obstacle_id': '1'} (T)
+2023-09-15 09:00:42,792 :: INFO :: self.success_obstacles: [{'x': 9, 'y': 9, 'd': -90, 'id': 1}]
+2023-09-15 09:00:42,795 :: DEBUG :: Sent to Android: {"cat": "image-rec", "value": {"image_id": "29", "obstacle_id": "1"}}
+2023-09-15 09:00:42,796 :: INFO :: At FIN, self.failed_obstacles: []
+2023-09-15 09:00:42,797 :: INFO :: At FIN, self.current_location: {'x': 1, 'y': 2, 'd': 90}
+2023-09-15 09:00:42,798 :: INFO :: Commands queue finished.
+2023-09-15 09:00:42,801 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Commands queue finished."}
+2023-09-15 09:00:42,804 :: DEBUG :: Sent to Android: {"cat": "info", "value": "finished"}
+2023-09-15 09:00:42,805 :: DEBUG :: PiAction retrieved from queue: stitch 
+2023-09-15 09:00:43,198 :: INFO :: Images stitched!
+2023-09-15 09:00:43,201 :: DEBUG :: Sent to Android: {"cat": "info", "value": "Images stitched!"}

@@ -198,11 +198,11 @@ class RaspberryPi:
                     # Commencing path following
                     if not self.command_queue.empty():
                         self.logger.info("Gryo reset!")
-                        self.stm_link.send("RS000")
                         # Main trigger to start movement #
                         self.unpause.set()
                         self.logger.info(
                             "Start command received, starting robot on path!")
+                        
                         self.android_queue.put(AndroidMessage(
                             'info', 'Starting robot on path!'))
                         self.android_queue.put(
@@ -222,10 +222,6 @@ class RaspberryPi:
             message: str = self.stm_link.recv()
 
             if message.startswith("ACK"):
-                if self.rs_flag == False:
-                    self.rs_flag = True
-                    self.logger.debug("ACK for RS000 from STM32 received.")
-                    continue
                 try:
                     self.movement_lock.release()
                     try:
