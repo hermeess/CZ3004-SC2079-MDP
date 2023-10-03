@@ -936,7 +936,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             //have to update selectedImageView and selectedGridCell
             selectedImageView = targetImageView;
             selectedGridCell = targetImageView;
-            selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
+            //not found colour
+            selectedGridCell.setBackgroundColor(Color.parseColor("#0019FF"));
 
             // Remove the targetImageView from its current parent
             ViewGroup targetParent = (ViewGroup) targetImageView.getParent();
