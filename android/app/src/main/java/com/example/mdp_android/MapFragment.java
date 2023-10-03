@@ -1245,17 +1245,20 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
 
-                                    //START BT CONNECTION SERVICE
+                                    // Start BT connection
                                     Intent connectIntent = new Intent(requireActivity(), BluetoothConnectionService.class);
-
                                     connectIntent.putExtra("serviceType", "connect");
                                     connectIntent.putExtra("device", myBTConnectionDevice);
                                     connectIntent.putExtra("id", myUUID);
                                     requireActivity().startService(connectIntent);
 
-
+                                    // Start AcceptThread
+                                    Intent acceptIntent = new Intent(requireActivity(), BluetoothConnectionService.class);
+                                    acceptIntent.putExtra("serviceType", "startAcceptThread");
+                                    requireActivity().startService(acceptIntent);
                                 }
                             });
+
                     alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -1324,6 +1327,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                     Log.d("Scanning images", obstacle_string + "this is the obstacle ID of images");
                     updateTarget(image_id, obstacle_string);
                     break;
+
 
                 // Add other cases as needed
 

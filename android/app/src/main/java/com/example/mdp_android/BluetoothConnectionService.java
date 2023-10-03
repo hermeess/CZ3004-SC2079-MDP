@@ -54,26 +54,41 @@ public class BluetoothConnectionService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 
-        myContext = getApplicationContext();
-        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (intent.getStringExtra("serviceType").equals("listen")) {
-
-            myDevice = (BluetoothDevice) intent.getExtras().getParcelable("device");
-
-            Log.d(TAG, "Service Handle: startAcceptThread");
-
-            startAcceptThread();
-        } else {
-            myDevice = (BluetoothDevice) intent.getExtras().getParcelable("device");
-            deviceUUID = (UUID) intent.getSerializableExtra("id");
-
-            Log.d(TAG, "Service Handle: startClientThread");
-
-            startClientThread(myDevice, deviceUUID);
+        if (intent == null) {
+            return;
         }
 
+        myContext = getApplicationContext();
+        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Log.d(TAG, "Trying to retrieve BluetoothDevice from intent");
+        myDevice = (BluetoothDevice) intent.getExtras().getParcelable("device");
+
+        if (myDevice == null) {
+            Log.e(TAG, "BluetoothDevice is null");
+            return;
+        }
+        String serviceType = intent.getStringExtra("serviceType");
+        if (serviceType == null) {
+            return;
+        }
+
+        myDevice = intent.getParcelableExtra("device");
+        deviceUUID = (UUID) intent.getSerializableExtra("id");
+
+        switch (serviceType) {
+            case "listen":
+                Log.d(TAG, "Service Handle: startAcceptThread");
+                startAcceptThread();
+                break;
+            case "connect":
+                Log.d(TAG, "Service Handle: startClientThread");
+                startClientThread(myDevice, deviceUUID);
+                break;
+            //... other case statements for other service types
+        }
     }
+
+
 
     /*
          A THREAD THAT RUNS WHILE LISTENING FOR INCOMING CONNECTIONS. IT BEHAVES LIKE
