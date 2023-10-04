@@ -61,10 +61,17 @@ def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), te
 
     # draw bounding box
     img = cv2.rectangle(img, (x1, y1), (x2, y2), (36,255,12), 2)
-    # print the text
-    img = cv2.rectangle(img, (x2 + 100, y1), (x2 + 450, y1 + 200), color, -1)
-    img = cv2.putText(img, id_to_name[int(image_id)], (x2 + 120, y1 + 80), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
-    img = cv2.putText(img, 'Image id='+image_id, (x2 + 120, y1 + 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+
+    # print the text (on right side)
+    # img = cv2.rectangle(img, (x2 + 100, y1), (x2 + 450, y1 + 200), color, -1)
+    # img = cv2.putText(img, id_to_name[int(image_id)], (x2 + 120, y1 + 80), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+    # img = cv2.putText(img, 'Image id='+image_id, (x2 + 120, y1 + 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+
+    # print the text (above box)
+    img = cv2.rectangle(img, (x1, y1 - 250), (x1 + 350, y1 - 50), color, -1)
+    img = cv2.putText(img, id_to_name[int(image_id)], (x1 + 20, y1 - 170), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+    img = cv2.putText(img, 'Image id='+image_id, (x1 + 20, y1 - 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+
     # save annotated image
     cv2.imwrite(f"image_results/annotated_image_{image_name}", img)
 
