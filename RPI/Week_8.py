@@ -202,6 +202,7 @@ class RaspberryPi:
                         self.unpause.set()
                         self.logger.info(
                             "Start command received, starting robot on path!")
+                        
                         self.android_queue.put(AndroidMessage(
                             'info', 'Starting robot on path!'))
                         self.android_queue.put(
@@ -221,6 +222,7 @@ class RaspberryPi:
             message: str = self.stm_link.recv()
 
             if message.startswith("ACK"):
+                time.sleep(0.05)
                 try:
                     self.movement_lock.release()
                     try:
