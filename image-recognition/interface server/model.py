@@ -1,5 +1,7 @@
+import time
 from PIL import Image
 from ultralytics import YOLO
+import shutil
 import os
 import cv2
 import numpy as np
@@ -223,6 +225,19 @@ def combine_image():
             x_offset = 50
             y_offset = 50 + max(height) + 50
 
-    combinedImg.save(os.path.join(folder_path, 'combinedImg.jpeg'))
+    combinedImg.save(os.path.join(folder_path, f'combinedImg_{int(time.time())}.jpeg'))
+
+    # move annotated images to another folder
+
+    if not os.path.exists('annotated'):
+        os.makedirs('annotated')
+
+    for img in annotated_images:
+        shutil.move(img, os.path.join('annotated', os.path.basename(img)))
+
+    raw_images = glob.glob(os.path.join(folder_path, 'raw_image_*'))
+
+    for img in raw_images:
+        os.remove(img)
 
     return combinedImg
