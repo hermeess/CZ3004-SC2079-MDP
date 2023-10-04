@@ -15,11 +15,6 @@ def get_status():
     # check if the server is running
     return jsonify({"result": "ok"})
 
-@app.route("/algo", methods = ["GET"]) 
-async def calc_path():
-    # here put algo function
-    return 'NA'
-
 @app.route('/image', methods=['POST'])
 def image_rec():
     '''
