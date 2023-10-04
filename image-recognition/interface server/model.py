@@ -115,6 +115,11 @@ def rec_image(image, model, signal):
     rec_result.sort(key=lambda x: x['bbox_area'], reverse=True)
     filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
 
+    if len(filtered_rec_result) == 0:
+        return {
+            'image_id': 'NA'
+        }
+
     final_rec = {}
 
     if len(filtered_rec_result) > 1:
