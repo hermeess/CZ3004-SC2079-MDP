@@ -9,11 +9,11 @@ import math
 def load_model():
     # model = torch.hub.load('./', 'custom', path='../weights/Week8_senior.pt', source='local')
     
-    ##week 8
-    # model = YOLO('../weights/week8_final.pt')
+    # week 8
+    model = YOLO('../weights/week8_final.pt')
     
     #week 9
-    model = YOLO('../image-recognition/weights/week9_2.04.pt')
+    # model = YOLO('../image-recognition/weights/week9_2.04.pt')
     
     return model
 

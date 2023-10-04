@@ -45,10 +45,10 @@ def image_rec():
     # TODO: rec_image function in model.py
     
     # #week 8
-    # rec_result = rec_image(filename, model, signal)
+    rec_result = rec_image(filename, model, signal)
     
     #week 9
-    rec_result = rec_image_week9(filename, model, signal)
+    # rec_result = rec_image_week9(filename, model, signal)
 
     result = {
         "image_id": str(rec_result['image_id']),
