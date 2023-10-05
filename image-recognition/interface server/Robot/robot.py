@@ -37,12 +37,6 @@ class Robot:
         """
         print("Converting commands to string...", end="")
         string_commands = [command.convert_to_message() for command in self.brain.commands]
-        #i = 0
-        #while i < len (string_commands):
-        #    if "SNAP" in string_commands[i]:
-        #        string_commands.insert(i, "AD000")
-        #        i += 1
-        #    i+=1
 
         print("Done!")
         return string_commands
@@ -53,6 +47,14 @@ class Robot:
         """
         print("Converting commands to string...", end="")
         string_commands = [command.convert_to_message() for command in self.brain.commands]
+
+        i = 0
+        while i < len (string_commands):
+           if "SNAP" in string_commands[i]:
+               string_commands.insert(i, "AD000")
+               i += 1
+           i+=1
+           
         print("Done!")
         print("-" * 70)
         return string_commands
