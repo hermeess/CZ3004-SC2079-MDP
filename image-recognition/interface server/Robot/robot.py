@@ -12,7 +12,7 @@ class Robot:
         # This value will never change, but it will not affect us as the robot uses a more fine-tuned internal
         # angle tracker.
         self.pos = RobotPosition(75,
-                                 20,
+                                 0,
                                  Direction.TOP,
                                  90)
                                  
@@ -37,6 +37,13 @@ class Robot:
         """
         print("Converting commands to string...", end="")
         string_commands = [command.convert_to_message() for command in self.brain.commands]
+        #i = 0
+        #while i < len (string_commands):
+        #    if "SNAP" in string_commands[i]:
+        #        string_commands.insert(i, "AD000")
+        #        i += 1
+        #    i+=1
+
         print("Done!")
         return string_commands
 
