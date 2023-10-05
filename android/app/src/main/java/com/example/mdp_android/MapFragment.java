@@ -387,7 +387,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         }
 
         // Load and add drawables dynamically to HorizontalScrollView
-        for (int i = 0; i <= 30; i++) {
+        for (int i = 0; i <= 40; i++) {
+            //skip 9 & 10
+            if(i == 9 || i == 10){
+                continue;
+            }
             // Create an ImageView
             ImageView imageView = new ImageView(requireContext());
 
@@ -399,7 +403,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
 
                 imageView.setTag("robot");
             } else{ // Loading other obstacles
-                int obstacleId = i + 10;
+                int obstacleId = i;
                 String resourceName = "obstacle_" + obstacleId;
                 drawableResource = getResources().getIdentifier(resourceName, "drawable", requireContext().getPackageName());
 
@@ -915,8 +919,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         drawableResource = getResources().getIdentifier(targetTag, "drawable", requireContext().getPackageName());
         targetImageView.setImageResource(drawableResource);
 
-        // First case if target != obstacle, observed target is not the obstacle.
-        if (targetImageView != null && obstacleImageView != null && !obstacleTag.equals(targetTag)) {
+        // Target is found, update the obstacle with the target image view
+        if (targetImageView != null && obstacleImageView != null) {
             ImageInfo obstacleInfo = imageInfoMap.get(obstacleTag);
             ImageInfo targetInfo = imageInfoMap.get(targetTag);
             int obstacleRow = obstacleInfo.getRow();
@@ -936,8 +940,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             //have to update selectedImageView and selectedGridCell
             selectedImageView = targetImageView;
             selectedGridCell = targetImageView;
-            //not found colour
-            selectedGridCell.setBackgroundColor(Color.parseColor("#0019FF"));
+            //found colour
+            selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
 
             // Remove the targetImageView from its current parent
             ViewGroup targetParent = (ViewGroup) targetImageView.getParent();
@@ -952,7 +956,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             targetParams.rowSpec = GridLayout.spec(rowArr[targetInfo.getRow()], 1f);
             targetParams.columnSpec = GridLayout.spec(targetInfo.getCol(), 1f);
             targetParams.setMargins(5, 5, 5, 5);
-            targetImageView.setPadding(0, 5,0, 5);
+            targetImageView.setPadding(0, 5, 0, 5);
             targetImageView.setLayoutParams(targetParams);
 
             GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
@@ -963,7 +967,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             // Move the obstacle image back to the linear layout of the horizontal scroll view
             // Set new LayoutParams for the obstacleImageView
             ViewGroup obstacleParent = (ViewGroup) obstacleImageView.getParent();
-            if(obstacleParent != null){
+            if (obstacleParent != null) {
                 obstacleParent.removeView(obstacleImageView);
             }
             LinearLayout.LayoutParams obstacleParams = new LinearLayout.LayoutParams(25, 25);
@@ -972,20 +976,21 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             obstacleInfo.setDirection("None");
             obstacleInfo.setRow(-1);
             obstacleInfo.setCol(-1);
-            obstacleImageView.setPadding(0,0,0,0);
+            obstacleImageView.setPadding(0, 0, 0, 0);
 
             // Add the obstacle image to the horizontal layout
             LinearLayout horizontalLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
             if (horizontalLayout != null) {
                 horizontalLayout.addView(obstacleImageView);
             }
-        } else if(targetImageView != null && obstacleImageView != null && obstacleTag.equals(targetTag)){
-            // At this point obstacle image is the correct one so can just change this obstacle image's background
-            selectedImageView = obstacleImageView;
-            selectedGridCell = obstacleImageView;
-            // Change cell to found color
-            selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
         }
+//        } else if(targetImageView != null && obstacleImageView != null && obstacleTag.equals(targetTag)){
+//            // At this point obstacle image is the correct one so can just change this obstacle image's background
+//            selectedImageView = obstacleImageView;
+//            selectedGridCell = obstacleImageView;
+//            // Change cell to found color
+//            selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
+//        }
     }
 
     // Add obstacles to map: To display the obstacles info that are in the grid
@@ -1090,7 +1095,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         int colNum = Integer.parseInt(col);
 
         // Check if row and col are within valid range (1 to 20)
-        if (rowNum >= 1 && rowNum <= 20 && colNum >= 1 && colNum <= 20 && Integer.parseInt(obstacleId)>= 11 && Integer.parseInt(obstacleId) <=40) {
+        if (rowNum >= 1 && rowNum <= 20 && colNum >= 1 && colNum <= 20 && Integer.parseInt(obstacleId)>= 1 && Integer.parseInt(obstacleId) <=8) {
             // Row and col are valid, you can proceed to add the ImageView to the grid layout
 
             // Find the corresponding ImageView from the horizontal layout
@@ -1171,8 +1176,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             // Row or col values are out of range, display an error message or handle it as needed
             // You can show a toast message or any other UI feedback to indicate the invalid input
             Toast.makeText(requireContext(), "Row and col values must be between 1 and 20", Toast.LENGTH_SHORT).show();
-        } else if(Integer.parseInt(obstacleId) < 11 || Integer.parseInt(obstacleId) >40){
-            Toast.makeText(requireContext(), "Obstacle id values must be between 11 and 40 inclusive", Toast.LENGTH_SHORT).show();
+        } else if(Integer.parseInt(obstacleId) < 1 || Integer.parseInt(obstacleId) >8){
+            Toast.makeText(requireContext(), "Obstacle id values must be between 1 and 8 inclusive", Toast.LENGTH_SHORT).show();
         }
     }
 
