@@ -235,15 +235,22 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ImageInfo robotInfo = imageInfoMap.get("robot");
                 //send to RPi (Start)
-                JSONObject json = new JSONObject();
-                try {
-                    json.put("cat", "control");
-                    json.put("value", "start");
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                if(myBTConnectionDevice == null){
+                    Toast.makeText(requireContext(), "Please connect to RPI.", Toast.LENGTH_SHORT).show();
+                } else if(robotInfo.getCol() == -1 && robotInfo.getRow() == -1){
+                    Toast.makeText(requireContext(), "Please place the robot in the grid.", Toast.LENGTH_SHORT).show();
+                } else{
+                    JSONObject json = new JSONObject();
+                    try {
+                        json.put("cat", "control");
+                        json.put("value", "start");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    BluetoothChat.writeMsg(json.toString().getBytes(Charset.defaultCharset()));
                 }
-                BluetoothChat.writeMsg(json.toString().getBytes(Charset.defaultCharset()));
             }
         });
 
@@ -305,11 +312,15 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         buttonSendToRpi.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                // Call sendObstacleToRpi here, this is the function that compiles the JSON format
-                try {
-                    sendObstacleToRpi();
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                if(myBTConnectionDevice == null){
+                    Toast.makeText(requireContext(), "Please connect to RPI.", Toast.LENGTH_SHORT).show();
+                } else{
+                    // Call sendObstacleToRpi here, this is the function that compiles the JSON format
+                    try {
+                        sendObstacleToRpi();
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });
@@ -1019,6 +1030,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         item.put("d", dirs);
 
         obstacleMap.put(imageInfoTag, item);
+
+        Log.d("Added obstacle to obstacle Map",obstacleMap.toString() + "x value" + imageInfo.getCol() + "y value" + imageInfo.getRow());
         TextView obstacleContent = rootView.findViewById(R.id.obstacleContent);
 
         StringBuilder resultString = new StringBuilder();
@@ -1090,94 +1103,99 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
     //this is for the dialog button portion
     @Override
     public void onObstacleDataSubmitted(String obstacleId, String row, String col, String direction) throws JSONException {
-        // Convert row and col to integers
-        int rowNum = Integer.parseInt(row);
-        int colNum = Integer.parseInt(col);
+        try {
+                // Convert row and col to integers
+                int rowNum = Integer.parseInt(row);
+                int colNum = Integer.parseInt(col);
 
-        // Check if row and col are within valid range (1 to 20)
-        if (rowNum >= 1 && rowNum <= 20 && colNum >= 1 && colNum <= 20 && Integer.parseInt(obstacleId)>= 1 && Integer.parseInt(obstacleId) <=8) {
-            // Row and col are valid, you can proceed to add the ImageView to the grid layout
 
-            // Find the corresponding ImageView from the horizontal layout
-            ImageView obstacleImageView = rootView.findViewWithTag("obstacle_" + obstacleId);
-            ViewGroup owner = (ViewGroup) obstacleImageView.getParent();
-            if (owner != null) {
-                owner.removeView(obstacleImageView);
-            }
+                if (rowNum >= 21 || colNum >= 21 || rowNum <= 0 || colNum <= 0) {
+                    // Row or col values are out of range, display an error message or handle it as needed
+                    // You can show a toast message or any other UI feedback to indicate the invalid input
+                    Toast.makeText(requireContext(), "Row and col values must be between 1 and 20", Toast.LENGTH_SHORT).show();
+                } else if (Integer.parseInt(obstacleId) < 1 || Integer.parseInt(obstacleId) > 8) {
+                    Toast.makeText(requireContext(), "Obstacle id values must be between 1 and 8 inclusive", Toast.LENGTH_SHORT).show();
+                }// Check if row and col are within valid range (1 to 20)
+                else if (rowNum >= 1 && rowNum <= 20 && colNum >= 1 && colNum <= 20 && Integer.parseInt(obstacleId) >= 1 && Integer.parseInt(obstacleId) <= 8) {
+                    // Row and col are valid, you can proceed to add the ImageView to the grid layout
 
-            String currentObstacle = removeObstacle(rowNum, colNum);
-            //if there is a current obstacle in this grid cell.
-            Log.d("Return value of curr obstacle", currentObstacle);
-            if(!currentObstacle.equals("")){
-                //remove the currentObstacle here;
-                ImageView currentObstacleImageView = rootView.findViewWithTag(currentObstacle);
-                ViewGroup ownerCurrObstacle = (ViewGroup) currentObstacleImageView.getParent();
-                if (ownerCurrObstacle != null) {
-                    ownerCurrObstacle.removeView(currentObstacleImageView);
+                    // Find the corresponding ImageView from the horizontal layout
+                    ImageView obstacleImageView = rootView.findViewWithTag("obstacle_" + obstacleId);
+                    ViewGroup owner = (ViewGroup) obstacleImageView.getParent();
+                    if (owner != null) {
+                        owner.removeView(obstacleImageView);
+                    }
+
+                    String currentObstacle = removeObstacle(rowNum, colNum);
+                    //if there is a current obstacle in this grid cell.
+                    Log.d("Return value of curr obstacle", currentObstacle);
+                    if (!currentObstacle.equals("")) {
+                        //remove the currentObstacle here;
+                        ImageView currentObstacleImageView = rootView.findViewWithTag(currentObstacle);
+                        ViewGroup ownerCurrObstacle = (ViewGroup) currentObstacleImageView.getParent();
+                        if (ownerCurrObstacle != null) {
+                            ownerCurrObstacle.removeView(currentObstacleImageView);
+                        }
+
+                        // Retrieve the tag to identify the dropped drawable
+                        String drawableTag = (String) currentObstacleImageView.getTag();
+
+                        // Reset the imageInfo back to the default values.
+                        ImageInfo imageInfo = imageInfoMap.get(drawableTag);
+                        if (imageInfo != null) {
+                            imageInfo.setDirection("None");
+                            imageInfo.setRow(-1);
+                            imageInfo.setCol(-1);
+                        }
+
+                        setGridCellBorderColor("None");
+                        LinearLayout linearLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
+
+                        // Set appropriate layout parameters for the image
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
+                        params.setMargins(10, 0, 10, 0);
+                        currentObstacleImageView.setLayoutParams(params);
+                        currentObstacleImageView.setPadding(0, 0, 0, 0);
+
+                        // Add ImageView to the HorizontalScrollView
+                        linearLayout.addView(currentObstacleImageView);
+                        currentObstacleImageView.setVisibility(View.VISIBLE);
+
+                        // Remove item from obstacleMap
+                        obstacleMap.remove(drawableTag);
+                    }
+
+                    // Set its row and column in the grid layout
+                    ImageInfo obstacleInfo = imageInfoMap.get("obstacle_" + obstacleId);
+                    obstacleInfo.setRow(rowNum);
+                    obstacleInfo.setCol(colNum);
+                    obstacleInfo.setDirection(direction.toLowerCase());
+
+                    addObstacleToMap("obstacle_" + obstacleId, obstacleInfo);
+                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                    params.width = 0;
+                    params.height = 0;
+                    params.rowSpec = GridLayout.spec(rowArr[rowNum], 1f);
+                    params.columnSpec = GridLayout.spec(colNum, 1f);
+                    params.setMargins(5, 5, 5, 5);
+                    obstacleImageView.setLayoutParams(params);
+
+                    GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
+                    if (gridLayout != null) {
+                        gridLayout.addView(obstacleImageView);
+                    }
+
+                    obstacleImageView.setPadding(0, 5, 0, 5);
+                    obstacleImageView.setVisibility(View.VISIBLE);
+
+                    selectedImageView = obstacleImageView;
+                    selectedGridCell = obstacleImageView;
+
+                    // Set the color of the grid based on direction (you can implement this logic)
+                    setGridCellBorderColor(direction);
                 }
-
-                // Retrieve the tag to identify the dropped drawable
-                String drawableTag = (String) currentObstacleImageView.getTag();
-
-                // Reset the imageInfo back to the default values.
-                ImageInfo imageInfo = imageInfoMap.get(drawableTag);
-                if (imageInfo != null) {
-                    imageInfo.setDirection("None");
-                    imageInfo.setRow(-1);
-                    imageInfo.setCol(-1);
-                }
-
-                setGridCellBorderColor("None");
-                LinearLayout linearLayout = rootView.findViewById(R.id.horizontalScrollViewLayout);
-
-                // Set appropriate layout parameters for the image
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
-                params.setMargins(10, 0, 10, 0);
-                currentObstacleImageView.setLayoutParams(params);
-                currentObstacleImageView.setPadding(0,0,0,0);
-
-                // Add ImageView to the HorizontalScrollView
-                linearLayout.addView(currentObstacleImageView);
-                currentObstacleImageView.setVisibility(View.VISIBLE);
-
-                // Remove item from obstacleMap
-                obstacleMap.remove(drawableTag);
-            }
-
-            // Set its row and column in the grid layout
-            ImageInfo obstacleInfo = imageInfoMap.get("obstacle_" + obstacleId);
-            obstacleInfo.setRow(rowNum);
-            obstacleInfo.setCol(colNum);
-            obstacleInfo.setDirection(direction.toLowerCase());
-
-            addObstacleToMap("obstacle_" + obstacleId, obstacleInfo);
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 0;
-            params.height = 0;
-            params.rowSpec = GridLayout.spec(rowArr[rowNum], 1f);
-            params.columnSpec = GridLayout.spec(colNum, 1f);
-            params.setMargins(5, 5, 5, 5);
-            obstacleImageView.setLayoutParams(params);
-
-            GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
-            if (gridLayout != null) {
-                gridLayout.addView(obstacleImageView);
-            }
-
-            obstacleImageView.setPadding(0, 5, 0, 5);
-            obstacleImageView.setVisibility(View.VISIBLE);
-
-            selectedImageView = obstacleImageView;
-            selectedGridCell = obstacleImageView;
-
-            // Set the color of the grid based on direction (you can implement this logic)
-            setGridCellBorderColor(direction);
-        } else if(rowNum >= 21 || colNum >= 21 || rowNum <= 0 || colNum <= 0){
-            // Row or col values are out of range, display an error message or handle it as needed
-            // You can show a toast message or any other UI feedback to indicate the invalid input
-            Toast.makeText(requireContext(), "Row and col values must be between 1 and 20", Toast.LENGTH_SHORT).show();
-        } else if(Integer.parseInt(obstacleId) < 1 || Integer.parseInt(obstacleId) >8){
-            Toast.makeText(requireContext(), "Obstacle id values must be between 1 and 8 inclusive", Toast.LENGTH_SHORT).show();
+        } catch(NumberFormatException e) {
+            Toast.makeText(requireContext(), "Please enter all fields.", Toast.LENGTH_SHORT).show();
         }
     }
 
