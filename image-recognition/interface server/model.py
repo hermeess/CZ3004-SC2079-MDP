@@ -64,15 +64,40 @@ def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), te
     # draw bounding box
     img = cv2.rectangle(img, (x1, y1), (x2, y2), (36,255,12), 2)
 
-    # print the text (on right side)
-    # img = cv2.rectangle(img, (x2 + 100, y1), (x2 + 450, y1 + 200), color, -1)
-    # img = cv2.putText(img, id_to_name[int(image_id)], (x2 + 120, y1 + 80), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
-    # img = cv2.putText(img, 'Image id='+image_id, (x2 + 120, y1 + 150), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+    TEXT_HEIGHT = 150
+    TEXT_WIDTH = 250
+    GAP = 50
 
-    # print the text (above box)
-    img = cv2.rectangle(img, (x1, y1 - 250), (x1 + 350, y1 - 50), color, -1)
-    img = cv2.putText(img, id_to_name[int(image_id)], (x1 + 20, y1 - 170), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
-    img = cv2.putText(img, 'Image id='+image_id, (x1 + 20, y1 - 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, text_color, 3)
+    # image dimension: 1024 * 768
+
+    if x2 + GAP + TEXT_WIDTH <= 1024:
+        if y1 + TEXT_HEIGHT <= 768:
+            # print the text on right side
+            img = cv2.rectangle(img, (x2 + GAP, y1), (x2 + GAP + TEXT_WIDTH, y1 + TEXT_HEIGHT), color, -1)
+            img = cv2.putText(img, id_to_name[int(image_id)], (x2 + GAP + 20, y1 + 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+            img = cv2.putText(img, 'Image id='+image_id, (x2 + GAP + 20, y1 + TEXT_HEIGHT - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+        else:
+            # print the text above bounding box
+            img = cv2.rectangle(img, (x1, y1 - GAP - TEXT_HEIGHT), (x1 + TEXT_WIDTH, y1 - GAP), color, -1)
+            img = cv2.putText(img, id_to_name[int(image_id)], (x1 + 20, y1 - GAP - TEXT_HEIGHT + 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+            img = cv2.putText(img, 'Image id='+image_id, (x1 + 20, y1 - GAP - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+    else:
+        if y1 + TEXT_HEIGHT <= 768:
+             # print the text on the left side
+            img = cv2.rectangle(img, (x1 - GAP - TEXT_WIDTH, y1), (x1 - GAP, y1 + TEXT_HEIGHT), color, -1)
+            img = cv2.putText(img, id_to_name[int(image_id)], (x1 - GAP - TEXT_WIDTH + 20, y1 + 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+            img = cv2.putText(img, 'Image id='+image_id, (x1 - GAP - TEXT_WIDTH + 20, y1 + TEXT_HEIGHT - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+        else:
+            # print the text above bounding box
+            img = cv2.rectangle(img, (x1, y1 - GAP - TEXT_HEIGHT), (x1 + TEXT_WIDTH, y1 - GAP), color, -1)
+            img = cv2.putText(img, id_to_name[int(image_id)], (x1 + 20, y1 - GAP - TEXT_HEIGHT + 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+            img = cv2.putText(img, 'Image id='+image_id, (x1 + 20, y1 - GAP - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+    
+    # print the text under bounding box
+    # img = cv2.rectangle(img, (x1, y2 + GAP), (x1 + TEXT_WIDTH, y2 + GAP + TEXT_HEIGHT), color, -1)
+    # img = cv2.putText(img, id_to_name[int(image_id)], (x1 + 20, y2 + GAP + 80), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 3)
+    # img = cv2.putText(img, 'Image id='+image_id, (x1 + 20, y2 + GAP + 150), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 3)
+
 
     # save annotated image
     cv2.imwrite(f"image_results/annotated_image_{image_name}", img)
