@@ -60,7 +60,7 @@ class RaspberryPi:
         # Messages that need to be processed by STM32, as well as snap commands
         self.command_queue = self.manager.Queue()
         # X,Y,D coordinates of the robot after execution of a command
-        self.path_queue = self.manager.Queue()
+        #self.path_queue = self.manager.Queue()
 
         self.proc_recv_android = None
         self.proc_recv_stm32 = None
@@ -222,7 +222,7 @@ class RaspberryPi:
             message: str = self.stm_link.recv()
 
             if message.startswith("ACK"):
-                time.sleep(0.05)
+                time.sleep(0.5)
                 try:
                     self.movement_lock.release()
                     try:
@@ -231,19 +231,6 @@ class RaspberryPi:
                         pass
                     self.logger.debug(
                         "ACK from STM32 received, movement lock released.")
-
-                    cur_location = self.path_queue.get_nowait()
-
-                    self.current_location['x'] = cur_location['x']
-                    self.current_location['y'] = cur_location['y']
-                    self.current_location['d'] = cur_location['d']
-                    self.logger.info(
-                        f"self.current_location = {self.current_location}")
-                    self.android_queue.put(AndroidMessage('location', {
-                        "x": cur_location['x'],
-                        "y": cur_location['y'],
-                        "d": cur_location['d'],
-                    }))
 
                 except Exception:
                     self.logger.warning("Tried to release a released lock!")
@@ -447,8 +434,6 @@ class RaspberryPi:
         self.clear_queues()
         for c in commands:
             self.command_queue.put(c)
-        for p in path[1:]:  # ignore first element as it is the starting position of the robot
-            self.path_queue.put(p)
 
         self.android_queue.put(AndroidMessage(
             "info", "Commands and path received Algo API. Robot is ready to move."))
@@ -476,8 +461,6 @@ class RaspberryPi:
         """Clear both command and path queues"""
         while not self.command_queue.empty():
             self.command_queue.get()
-        while not self.path_queue.empty():
-            self.path_queue.get()
 
     def check_api(self) -> bool:
         """Check whether image recognition and algorithm API server is up and running
