@@ -25,9 +25,9 @@ DARK_GREY = '#6B6B6B'
 DARK_BLACK = '#1a1e24'
   
 # PyGame settings
-SCALING_FACTOR = 5
-FRAMES = 60
-WINDOW_SIZE = 1300, 1000
+SCALING_FACTOR = 6
+FRAMES = 90
+WINDOW_SIZE = 1300, 1300
 
 # Robot Attributes
 ROBOT_LENGTH = 20 * SCALING_FACTOR  # Recommended robot footprint is 30cm by 30cm
