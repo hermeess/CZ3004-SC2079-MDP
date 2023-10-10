@@ -33,5 +33,5 @@ HEIGHT = 20
 ITERATIONS = 2000
 TURN_RADIUS = 1
 
-SAFE_COST = 1000 # the cost for the turn in case there is a chance that the robot is touch some obstacle
+SAFE_COST = 1750 # the cost for the turn in case there is a chance that the robot is touch some obstacle
 SCREENSHOT_COST = 50 # the cost for the place where the picture is taken

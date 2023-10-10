@@ -170,7 +170,7 @@ def rec_image(image, model, signal):
 
             else: # signal == 'C'
                 final_rec = shortlisted_rec_result[len(shortlisted_rec_result)//2]
-        elif len(shortlisted_rec_result == 1):
+        elif len(shortlisted_rec_result) == 1:
             final_rec = shortlisted_rec_result[0]
         else:
             return {'image_id': 'NA'}

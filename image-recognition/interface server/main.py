@@ -78,6 +78,14 @@ def cal_path():
 
     # Add each obstacle into the MazeSolver. Each obstacle is defined by its x,y positions, its direction, and its id
     for ob in obstacles:
+        if (ob['d'] == 0):
+            ob['d'] = 2
+        elif (ob['d'] == -90):
+            ob['d'] = 4
+        elif (ob['d'] == 90):
+            ob['d'] = 0
+        elif (ob['d'] == 180):
+            ob['d'] = 6
         maze_solver.add_obstacle(ob['x'], ob['y'], ob['d'], ob['id'])
 
     start = time.time()
@@ -105,6 +113,9 @@ def cal_path():
         else:
             i += 1
         path_results.append(optimal_path[i].get_dict())
+    
+    print (commands)
+    
     return jsonify({
         "data": {
             'distance': distance,
