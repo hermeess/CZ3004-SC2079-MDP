@@ -658,11 +658,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             ImageInfo imageInfo = imageInfoMap.get(selectedImageViewTag);
             if (imageInfo != null) {
                 imageInfo.setDirection(direction);
-                String obstacleJson = constructObstacleJson(imageInfo, selectedImageViewTag);
-                if (obstacleJson != null) {
-//                    BluetoothChat.writeMsg(obstacleJson.getBytes(Charset.defaultCharset()));
-                    Log.d("Obstacle json", obstacleJson.toString());
-                }
+//                String obstacleJson = constructObstacleJson(imageInfo, selectedImageViewTag);
+//                if (obstacleJson != null) {
+////                    BluetoothChat.writeMsg(obstacleJson.getBytes(Charset.defaultCharset()));
+//                    Log.d("Obstacle json", obstacleJson.toString());
+//                }
                 //Send the data to bluetooth here, this is the one with the updated direction + x,y
                 Log.d("ImageInfo", imageInfo.toString());
                 //>>Bluetooth>>sendIMageInfoToBluetooth(imageInfo)
@@ -1208,7 +1208,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             // Extract values from the JSONObject
             int x = obstacleData.optInt("x", -1)+1;
             int y = obstacleData.optInt("y", -1)+1;
-            if (x == row && col == col) {
+            if (y == row && x == col) {
                 isOccupiedKey = key;
                 break;
             }
