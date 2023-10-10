@@ -400,7 +400,7 @@ class RaspberryPi:
         except:
             pass
 
-    def request_algo(self, data, robot_x=0, robot_y=0, robot_dir=90, retrying=False):
+    def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
         """
         Requests for a series of commands and the path from the Algo API.
         The received commands and path are then queued in the respective queues
