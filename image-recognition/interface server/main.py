@@ -75,6 +75,7 @@ def cal_path():
 
     # Initialize MazeSolver object with robot size of 20x20, bottom left corner of robot at (1,1), facing north, and whether to use a big turn or not.
     maze_solver = MazeSolver(20, 20, robot_x, robot_y, robot_direction, big_turn=1)
+    obstacle_dict = {}
 
     # Add each obstacle into the MazeSolver. Each obstacle is defined by its x,y positions, its direction, and its id
     for ob in obstacles:
@@ -87,6 +88,7 @@ def cal_path():
         elif (ob['d'] == 180):
             ob['d'] = 6
         maze_solver.add_obstacle(ob['x'], ob['y'], ob['d'], ob['id'])
+        obstacle_dict[str(ob['id'])] = {"x": ob['x'], "y": ob['y']}
 
     start = time.time()
     # Get shortest path
@@ -101,26 +103,40 @@ def cal_path():
     path_results = [optimal_path[0].get_dict()]
     # Process each command individually and append the location the robot should be after executing that command to path_results
     i = 0
+
+    return_command = []
     for command in commands:
         if command.startswith("SNAP"):
+            obstacle_id = command[4]
+            obstacle = obstacle_dict[obstacle_id]
+            x_diff = abs (path_results[-1]['x'] - obstacle['x'])
+            y_diff = abs (path_results[-1]['y'] - obstacle['y'])
+
+            dist_before_obs = max(x_diff, y_diff)
+            return_command.append("AD{:03d}".format(dist_before_obs * 10 - 20))
+            return_command.append(command)
             continue
         if command.startswith("FIN"):
+            return_command.append(command)
             continue
         elif command.startswith("FW") or command.startswith("FS"):
             i += int(command[2:]) // 10
+            return_command.append(command)
         elif command.startswith("BW") or command.startswith("BS"):
             i += int(command[2:]) // 10
+            return_command.append(command)
         else:
             i += 1
+            return_command.append(command)
         path_results.append(optimal_path[i].get_dict())
     
-    print (commands)
+    print (return_command)
     
     return jsonify({
         "data": {
             'distance': distance,
             'path': path_results,
-            'commands': commands
+            'commands': return_command
         },
         "error": None
     })
