@@ -995,13 +995,6 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                 horizontalLayout.addView(obstacleImageView);
             }
         }
-//        } else if(targetImageView != null && obstacleImageView != null && obstacleTag.equals(targetTag)){
-//            // At this point obstacle image is the correct one so can just change this obstacle image's background
-//            selectedImageView = obstacleImageView;
-//            selectedGridCell = obstacleImageView;
-//            // Change cell to found color
-//            selectedGridCell.setBackgroundColor(Color.parseColor("#39FF14"));
-//        }
     }
 
     // Add obstacles to map: To display the obstacles info that are in the grid

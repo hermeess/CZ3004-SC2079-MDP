@@ -327,7 +327,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/gridLayout"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="Obstacles Content..."
                 android:textSize="8sp"
                 android:textColor="#000000" />

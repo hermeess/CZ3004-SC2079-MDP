@@ -11,26 +11,27 @@
         android:hint="Obstacle Id" />
 
     <EditText
-        android:id="@+id/editRow"
+        android:id="@+id/editCol"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/editObstacleId"
         android:layout_marginTop="16dp"
-        android:hint="Row (Y)" />
+        android:hint="Col (X)" />
+
 
     <EditText
-        android:id="@+id/editCol"
+        android:id="@+id/editRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editRow"
+        android:layout_below="@id/editCol"
         android:layout_marginTop="16dp"
-        android:hint="Col (X)" />
+        android:hint="Row (Y)" />
 
     <EditText
         android:id="@+id/editDirection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editCol"
+        android:layout_below="@id/editRow"
         android:layout_marginTop="16dp"
         android:hint="Direction" />
 
