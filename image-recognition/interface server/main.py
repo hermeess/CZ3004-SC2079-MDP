@@ -87,7 +87,7 @@ def cal_path():
         elif (ob['d'] == 90):
             ob['d'] = 0
         elif (ob['d'] == 180):
-           ob['d'] = 6
+            ob['d'] = 6
         maze_solver.add_obstacle(ob['x'], ob['y'], ob['d'], ob['id'])
         obstacle_dict[str(ob['id'])] = {"x": ob['x'], "y": ob['y']}
 
