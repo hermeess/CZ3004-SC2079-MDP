@@ -64,6 +64,7 @@ def cal_path():
     :return: a json object with a key "data" and value a dictionary with keys "distance", "path", and "commands"
     """
     # Get the json data from the request
+    print("Received algo request")
     content = request.json
 
     # Get the obstacles, big_turn, retrying, robot_x, robot_y, and robot_direction from the json data
@@ -86,7 +87,7 @@ def cal_path():
         elif (ob['d'] == 90):
             ob['d'] = 0
         elif (ob['d'] == 180):
-            ob['d'] = 6
+           ob['d'] = 6
         maze_solver.add_obstacle(ob['x'], ob['y'], ob['d'], ob['id'])
         obstacle_dict[str(ob['id'])] = {"x": ob['x'], "y": ob['y']}
 
