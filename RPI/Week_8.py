@@ -373,8 +373,8 @@ class RaspberryPi:
                 f"self.success_obstacles: {self.success_obstacles}")
             self.android_queue.put(AndroidMessage("image-rec", results))
             
-            # release lock so that bot can continue moving
-            self.movement_lock.release()
+        # release lock so that bot can continue moving
+        self.movement_lock.release()
 
     def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
         """
