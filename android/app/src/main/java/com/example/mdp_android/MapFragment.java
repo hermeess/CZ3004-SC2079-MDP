@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import com.example.mdp_android.BluetoothConnectionService;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MapFragment#newInstance} factory method to
@@ -1249,42 +1251,21 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                 connectedState = false;
                 connectionStatusBox.setText(R.string.btStatusOffline);
 
-                if (currentActivity) {
+                Toast.makeText(requireContext(),"I am disconnected from RPI", Toast.LENGTH_SHORT).show();
 
-                    //RECONNECT DIALOG MSG
-                    AlertDialog alertDialog = new AlertDialog.Builder(requireActivity()).create();
 
-                    alertDialog.setTitle("BLUETOOTH DISCONNECTED");
-                    String deviceName = (myBTConnectionDevice != null) ? myBTConnectionDevice.getName() : "Unknown Device";
-                    alertDialog.setMessage("Connection with device: '" + deviceName + "' has ended. Do you want to reconnect?");
+                //START BT CONNECTION SERVICE
+                Intent connectIntent = new Intent(getActivity(), BluetoothConnectionService.class);
+                connectIntent.putExtra("serviceType", "connect");
+                connectIntent.putExtra("device", myBTConnectionDevice);
+                connectIntent.putExtra("id", myUUID);
 
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    // Start BT connection
-                                    Intent connectIntent = new Intent(requireActivity(), BluetoothConnectionService.class);
-                                    connectIntent.putExtra("serviceType", "connect");
-                                    connectIntent.putExtra("device", myBTConnectionDevice);
-                                    connectIntent.putExtra("id", myUUID);
-                                    requireActivity().startService(connectIntent);
-
-                                    // Start AcceptThread
-                                    Intent acceptIntent = new Intent(requireActivity(), BluetoothConnectionService.class);
-                                    acceptIntent.putExtra("serviceType", "startAcceptThread");
-                                    requireActivity().startService(acceptIntent);
-                                }
-                            });
-
-                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.show();
-
+                Connect myConnection = new Connect();
+                while(connectionStatus.equals("disconnect")){
+                    myConnection.startBTConnection(myBTConnectionDevice, myUUID, requireContext());
                 }
+
+
             }
             //SUCCESSFULLY CONNECTED TO BLUETOOTH DEVICE
             else if (connectionStatus.equals("connect")) {

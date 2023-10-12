@@ -58,7 +58,7 @@ public class Connect extends AppCompatActivity {
 
     //VIEWS ANN BUTTONS
     ListView lvNewDevices;
-    ListView lvPairedDevices;
+    public ListView lvPairedDevices;
     Button btnSend;
     EditText sendMessage;
     Button btnSearch;
@@ -233,7 +233,7 @@ public class Connect extends AppCompatActivity {
                     }*/
 
                     //START CONNECTION WITH THE BOUNDED DEVICE
-                    startBTConnection(myBTDevice, myUUID);
+                    startBTConnection(myBTDevice, myUUID, Connect.this);
                 }
                 lvPairedDevices.setAdapter(myPairedDeviceListAdapter);
             }
@@ -320,25 +320,7 @@ public class Connect extends AppCompatActivity {
                 }
 
                 //RECONNECT DIALOG MSG
-                AlertDialog alertDialog = new AlertDialog.Builder(Connect.this).create();
-                alertDialog.setTitle("BLUETOOTH DISCONNECTED");
-                String deviceName = (myBTConnectionDevice != null) ? myBTConnectionDevice.getName() : "Unknown Device";
-                alertDialog.setMessage("Connection with device: '" + deviceName + "' has ended. Do you want to reconnect?");
-
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                startBTConnection(myBTConnectionDevice, myUUID);
-
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
+               startService(connectIntent);
             }
 
             //SUCCESSFULLY CONNECTED TO BLUETOOTH DEVICE
@@ -732,7 +714,7 @@ public class Connect extends AppCompatActivity {
     /*
         START BLUETOOTH CHAT SERVICE METHOD
     */
-    public void startBTConnection(BluetoothDevice device, UUID uuid) {
+    public void startBTConnection(BluetoothDevice device, UUID uuid, Context context) {
 
 
 
@@ -750,9 +732,12 @@ public class Connect extends AppCompatActivity {
         connectIntent.putExtra("device", device);
         connectIntent.putExtra("id", uuid);
 
+
         Log.d(TAG, "StartBTConnection: Starting Bluetooth Connection Service!");
 
-        startService(connectIntent);
+        context.getApplicationContext().startService(connectIntent);
+
+        Log.d(TAG, "StartBTConnection: Starting Bluetooth Connection Service ended!");
     }
 
 

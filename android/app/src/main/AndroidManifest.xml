@@ -36,7 +36,9 @@
                 <action android:name="android.bluetooth.device.action.FOUND" />
             </intent-filter>
         </receiver>
-        <service android:name=".BluetoothConnectionService" />
+        <service android:name=".BluetoothConnectionService"
+            android:enabled="true"
+            android:exported="true"/>
 
         <activity
             android:name=".MainActivity"
