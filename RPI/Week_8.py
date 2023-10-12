@@ -302,6 +302,7 @@ class RaspberryPi:
                     "info", "Commands queue finished."))
                 self.android_queue.put(AndroidMessage("info", "finished"))
                 self.rpi_action_queue.put(PiAction(cat="stitch", value=""))
+                self.img_lock.release()
             else:
                 raise Exception(f"Unknown command: {command}")
 
