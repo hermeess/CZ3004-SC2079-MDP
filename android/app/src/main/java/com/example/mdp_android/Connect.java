@@ -727,7 +727,7 @@ public class Connect extends AppCompatActivity {
 
         Log.d(TAG, "Attempting to connect to device: " + device.getName() + " - " + device.getAddress());
         Log.d(TAG, "StartBTConnection: Initializing RFCOM Bluetooth Connection");
-        connectIntent = new Intent(Connect.this, BluetoothConnectionService.class);
+        connectIntent = new Intent(context, BluetoothConnectionService.class);
         connectIntent.putExtra("serviceType", "connect");
         connectIntent.putExtra("device", device);
         connectIntent.putExtra("id", uuid);

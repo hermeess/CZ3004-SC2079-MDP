@@ -3,6 +3,7 @@ package com.example.mdp_android;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,6 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1246,6 +1248,16 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             //DISCONNECTED FROM BLUETOOTH CHAT
             if (connectionStatus.equals("disconnect")) {
 
+                BluetoothSocket socket = myBTConnectionDevice.createRfcommSocketToServiceRecord(myUUID);
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                Intent connectIntent = new Intent(getActivity(), BluetoothConnectionService.class);
+
+
+
                 Log.d("SettingsFragment:", "Device Disconnected");
                 connectedDevice = null;
                 connectedState = false;
@@ -1255,15 +1267,14 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
 
 
                 //START BT CONNECTION SERVICE
-                Intent connectIntent = new Intent(getActivity(), BluetoothConnectionService.class);
                 connectIntent.putExtra("serviceType", "connect");
                 connectIntent.putExtra("device", myBTConnectionDevice);
                 connectIntent.putExtra("id", myUUID);
 
                 Connect myConnection = new Connect();
-                while(connectionStatus.equals("disconnect")){
-                    myConnection.startBTConnection(myBTConnectionDevice, myUUID, requireContext());
-                }
+
+                myConnection.startBTConnection(myBTConnectionDevice, myUUID, requireContext());
+
 
 
             }
