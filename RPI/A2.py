@@ -64,14 +64,14 @@ class RaspberryPi:
         """
         obstacle_id, signal = obstacle_id_with_signal.split("_")
         self.logger.info(f"Capturing image for obstacle id: {obstacle_id}")
-        url = f"http://192.168.24.30:5007/image"
+        url = f"http://192.168.24.16:5007/image"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
 
         # capture an image
         stream = io.BytesIO()
         with picamera.PiCamera() as camera:
             camera.start_preview()
-            time.sleep(2)
+            time.sleep(1)
             camera.capture(stream, format='jpeg')
 
         self.logger.debug("Requesting from image API")

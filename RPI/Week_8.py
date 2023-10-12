@@ -294,22 +294,6 @@ class RaspberryPi:
                     f"At FIN, self.failed_obstacles: {self.failed_obstacles}")
                 self.logger.info(
                     f"At FIN, self.current_location: {self.current_location}")
-                '''if len(self.failed_obstacles) != 0 and self.failed_attempt == False:
-
-                    new_obstacle_list = list(self.failed_obstacles)
-                    for i in list(self.success_obstacles):
-                        # {'x': 5, 'y': 11, 'id': 1, 'd': 4}
-                        i['d'] = 8
-                        new_obstacle_list.append(i)
-
-                    self.logger.info("Attempting to go to failed obstacles")
-                    self.failed_attempt = True
-                    self.request_algo({'obstacles': new_obstacle_list, 'mode': '0'},
-                                      self.current_location['x'], self.current_location['y'], self.current_location['d'], retrying=True)
-                    self.retrylock = self.manager.Lock()
-                    self.movement_lock.release()
-                    continue
-                '''
                 self.unpause.clear()
                 self.movement_lock.release()
                 self.logger.info("Commands queue finished.")
@@ -351,49 +335,43 @@ class RaspberryPi:
         url = f"http://{API_IP}:{API_PORT}/image"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
 
-        for i in range(2):
-            # capture an image
-            stream = io.BytesIO()
-            with picamera.PiCamera() as camera:
-                camera.start_preview()
-                if (i == 1):
-                    camera.exposure_mode = 'backlight'
-                time.sleep(1)
-                camera.capture(stream, format='jpeg')
-                if (i == 1):
-                    camera.exposure_mode = 'auto'
+        # capture an image
+        stream = io.BytesIO()
+        with picamera.PiCamera() as camera:
+            camera.start_preview()
+            time.sleep(1)
+            camera.capture(stream, format='jpeg')
 
-            self.logger.debug("Requesting from image API")
+        self.logger.debug("Requesting from image API")
 
-            image_data = stream.getvalue()
-            response = requests.post(
-                url, files={"file": (filename, image_data)}) 
+        image_data = stream.getvalue()
+        response = requests.post(
+            url, files={"file": (filename, image_data)}) 
 
-            if response.status_code != 200:
-                self.logger.error(
-                    "Something went wrong when requesting path from image-rec API. Please try again.")
-                return
+        if response.status_code != 200:
+            self.logger.error(
+                "Something went wrong when requesting path from image-rec API. Please try again.")
+            return
 
-            results = json.loads(response.content)
+        results = json.loads(response.content)
 
-            self.logger.info(f"results: {results}")
-            self.logger.info(f"self.obstacles: {self.obstacles}")
+        self.logger.info(f"results: {results}")
+        self.logger.info(f"self.obstacles: {self.obstacles}")
+        self.logger.info(
+            f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
+
+        if results['image_id'] == 'NA':
+            self.failed_obstacles.append(
+                self.obstacles[int(results['obstacle_id'])])
             self.logger.info(
-                f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
-
-            if results['image_id'] == 'NA':
-                self.failed_obstacles.append(
-                    self.obstacles[int(results['obstacle_id'])])
-                self.logger.info(
-                    f"Added Obstacle {results['obstacle_id']} to failed obstacles.")
-                self.logger.info(f"self.failed_obstacles: {self.failed_obstacles}")
-            else:
-                self.success_obstacles.append(
-                    self.obstacles[int(results['obstacle_id'])])
-                self.logger.info(
-                    f"self.success_obstacles: {self.success_obstacles}")
-                self.android_queue.put(AndroidMessage("image-rec", results))
-                break
+                f"Added Obstacle {results['obstacle_id']} to failed obstacles.")
+            self.logger.info(f"self.failed_obstacles: {self.failed_obstacles}")
+        else:
+            self.success_obstacles.append(
+                self.obstacles[int(results['obstacle_id'])])
+            self.logger.info(
+                f"self.success_obstacles: {self.success_obstacles}")
+            self.android_queue.put(AndroidMessage("image-rec", results))
             
             # release lock so that bot can continue moving
             self.movement_lock.release()
