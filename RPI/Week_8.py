@@ -222,13 +222,9 @@ class RaspberryPi:
             message: str = self.stm_link.recv()
 
             if message.startswith("ACK"):
-                time.sleep(0.5)
+                time.sleep(0.1)
                 try:
                     self.movement_lock.release()
-                    try:
-                        self.retrylock.release()
-                    except:
-                        pass
                     self.logger.debug(
                         "ACK from STM32 received, movement lock released.")
 
@@ -355,50 +351,52 @@ class RaspberryPi:
         url = f"http://{API_IP}:{API_PORT}/image"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
 
-        # capture an image
-        stream = io.BytesIO()
-        with picamera.PiCamera() as camera:
-            camera.start_preview()
-            time.sleep(2)
-            camera.capture(stream, format='jpeg')
+        for i in range(2):
+            # capture an image
+            stream = io.BytesIO()
+            with picamera.PiCamera() as camera:
+                camera.start_preview()
+                if (i == 1):
+                    camera.exposure_mode = 'backlight'
+                time.sleep(1)
+                camera.capture(stream, format='jpeg')
+                if (i == 1):
+                    camera.exposure_mode = 'auto'
 
-        self.logger.debug("Requesting from image API")
+            self.logger.debug("Requesting from image API")
 
-        image_data = stream.getvalue()
-        response = requests.post(
-            url, files={"file": (filename, image_data)}) 
+            image_data = stream.getvalue()
+            response = requests.post(
+                url, files={"file": (filename, image_data)}) 
 
-        if response.status_code != 200:
-            self.logger.error(
-                "Something went wrong when requesting path from image-rec API. Please try again.")
-            return
+            if response.status_code != 200:
+                self.logger.error(
+                    "Something went wrong when requesting path from image-rec API. Please try again.")
+                return
 
-        results = json.loads(response.content)
+            results = json.loads(response.content)
 
-        self.logger.info(f"results: {results}")
-        self.logger.info(f"self.obstacles: {self.obstacles}")
-        self.logger.info(
-            f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
-
-        if results['image_id'] == 'NA':
-            self.failed_obstacles.append(
-                self.obstacles[int(results['obstacle_id'])])
+            self.logger.info(f"results: {results}")
+            self.logger.info(f"self.obstacles: {self.obstacles}")
             self.logger.info(
-                f"Added Obstacle {results['obstacle_id']} to failed obstacles.")
-            self.logger.info(f"self.failed_obstacles: {self.failed_obstacles}")
-        else:
-            self.success_obstacles.append(
-                self.obstacles[int(results['obstacle_id'])])
-            self.logger.info(
-                f"self.success_obstacles: {self.success_obstacles}")
-            self.android_queue.put(AndroidMessage("image-rec", results))
-        
-        # release lock so that bot can continue moving
-        self.movement_lock.release()
-        try:
-            self.retrylock.release()
-        except:
-            pass
+                f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
+
+            if results['image_id'] == 'NA':
+                self.failed_obstacles.append(
+                    self.obstacles[int(results['obstacle_id'])])
+                self.logger.info(
+                    f"Added Obstacle {results['obstacle_id']} to failed obstacles.")
+                self.logger.info(f"self.failed_obstacles: {self.failed_obstacles}")
+            else:
+                self.success_obstacles.append(
+                    self.obstacles[int(results['obstacle_id'])])
+                self.logger.info(
+                    f"self.success_obstacles: {self.success_obstacles}")
+                self.android_queue.put(AndroidMessage("image-rec", results))
+                break
+            
+            # release lock so that bot can continue moving
+            self.movement_lock.release()
 
     def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
         """
