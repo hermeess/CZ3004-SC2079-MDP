@@ -222,7 +222,13 @@ public class BluetoothConnectionService extends IntentService {
                     }
                 }
             }
-
+            try{
+                if (temp != null){
+                    temp.close();
+                }
+            }catch (IOException e1){
+                Log.e(TAG, "Error closing socket: " + e1.getMessage());
+            }
             // If the above code didn't return, it means the connection was not established. Fallback to hardcoded UUID.
             UUID fallbackUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
             try {
@@ -245,16 +251,14 @@ public class BluetoothConnectionService extends IntentService {
 
                 // Here's your original catch block for closing the socket
                 try {
-                    if (temp != null) {
-                        temp.close();
-                    }
-
                     connectionStatusIntent = new Intent("btConnectionStatus");
-                    connectionStatusIntent.putExtra("ConnectionStatus", "connectionFail");
+                    connectionStatusIntent.putExtra("ConnectionStatus", "connect");
                     connectionStatusIntent.putExtra("Device", myDevice);
                     LocalBroadcastManager.getInstance(myContext).sendBroadcast(connectionStatusIntent);
-                    Log.d(TAG, "run: Socket Closed: Connection Failed!! " + e.getMessage());
-                } catch (IOException e1) {
+                    Log.d(TAG, "I am connected once again!! " + e.getMessage());
+
+                    BluetoothChat.connected(temp, myDevice, myContext);
+                } catch (Exception e1) {
                     Log.d(TAG, "myConnectThread, run: Unable to close socket connection: " + e1.getMessage());
                 }
             }

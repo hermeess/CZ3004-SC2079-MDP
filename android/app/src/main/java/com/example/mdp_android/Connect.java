@@ -329,8 +329,8 @@ public class Connect extends AppCompatActivity {
                 prefs.edit().putString("lastConnectedDeviceAddress", myBTConnectionDevice.getAddress()).apply();
 
                 Log.d("ConnectAcitvity:","Device Connected");
-                Toast.makeText(Connect.this, "Connection Established: "+ myBTConnectionDevice.getName(),
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(Connect.this, "Connection Established: "+ myBTConnectionDevice.getName(),
+//                        Toast.LENGTH_LONG).show();
             }
 
             //BLUETOOTH CONNECTION FAILED

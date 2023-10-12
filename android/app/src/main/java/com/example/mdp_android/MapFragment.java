@@ -1247,13 +1247,21 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             //myBTConnectionDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             //DISCONNECTED FROM BLUETOOTH CHAT
             if (connectionStatus.equals("disconnect")) {
+//                BluetoothSocket socket = null;
+//                try{
+//                    socket = myBTConnectionDevice.createRfcommSocketToServiceRecord(myUUID);
+//
+//                } catch (IOException e){
+//                    Log.d("Socket reconnectino", "PLeaser recoonect");
+//                }
+//                if (socket != null) {
+//                    try {
+//                        socket.close();
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
 
-                BluetoothSocket socket = myBTConnectionDevice.createRfcommSocketToServiceRecord(myUUID);
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
                 Intent connectIntent = new Intent(getActivity(), BluetoothConnectionService.class);
 
 
@@ -1274,7 +1282,11 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
                 Connect myConnection = new Connect();
 
                 myConnection.startBTConnection(myBTConnectionDevice, myUUID, requireContext());
+                connectedDevice = myBTConnectionDevice.getName();
+                connectedState = true;
+                connectionStatusBox.setText(connectedDevice);
 
+//                Toast.makeText(requireActivity(), "Connection Established: " + myBTConnectionDevice.getName(), Toast.LENGTH_SHORT).show();
 
 
             }
