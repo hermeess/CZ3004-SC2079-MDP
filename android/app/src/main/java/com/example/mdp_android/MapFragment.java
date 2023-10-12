@@ -930,6 +930,7 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
         drawableResource = getResources().getIdentifier(targetTag, "drawable", requireContext().getPackageName());
         targetImageView.setImageResource(drawableResource);
 
+
         // Target is found, update the obstacle with the target image view
         if (targetImageView != null && obstacleImageView != null) {
             ImageInfo obstacleInfo = imageInfoMap.get(obstacleTag);
@@ -971,9 +972,8 @@ public class MapFragment extends Fragment implements ObstacleDialogListener{
             targetImageView.setLayoutParams(targetParams);
 
             GridLayout gridLayout = rootView.findViewById(R.id.gridLayout);
-            if (gridLayout != null) {
-                gridLayout.addView(targetImageView);
-            }
+            gridLayout.addView(targetImageView);
+
 
             // Move the obstacle image back to the linear layout of the horizontal scroll view
             // Set new LayoutParams for the obstacleImageView
