@@ -53,26 +53,27 @@ class RaspberryPi:
         self.unpause = self.manager.Event()
 
         self.movement_lock = self.manager.Lock()
+        self.img_lock = self.manager.Lock()
 
-        self.android_queue = self.manager.Queue()  # Messages to send to Android
+        # Messages to send to Android
+        self.android_queue = self.manager.Queue()
         # Messages that need to be processed by RPi
         self.rpi_action_queue = self.manager.Queue()
         # Messages that need to be processed by STM32, as well as snap commands
         self.command_queue = self.manager.Queue()
-        # X,Y,D coordinates of the robot after execution of a command
-        #self.path_queue = self.manager.Queue()
+        # Images to send to image server
+        self.img_queue = self.manager.Queue()
 
         self.proc_recv_android = None
         self.proc_recv_stm32 = None
         self.proc_android_sender = None
         self.proc_command_follower = None
         self.proc_rpi_action = None
-        self.rs_flag = False
+        self.proc_img_sender = None
+
         self.success_obstacles = self.manager.list()
         self.failed_obstacles = self.manager.list()
         self.obstacles = self.manager.dict()
-        self.current_location = self.manager.dict()
-        self.failed_attempt = False
 
     def start(self):
         """Starts the RPi orchestrator"""
@@ -91,6 +92,7 @@ class RaspberryPi:
             self.proc_android_sender = Process(target=self.android_sender)
             self.proc_command_follower = Process(target=self.command_follower)
             self.proc_rpi_action = Process(target=self.rpi_action)
+            self.proc_img_sender = Process(target=self.img_sender)
 
             # Start child processes
             self.proc_recv_android.start()
@@ -98,6 +100,7 @@ class RaspberryPi:
             self.proc_android_sender.start()
             self.proc_command_follower.start()
             self.proc_rpi_action.start()
+            self.proc_img_sender.start()
 
             self.logger.info("Child Processes started")
 
@@ -105,7 +108,6 @@ class RaspberryPi:
 
             # Send success message to Android
             self.android_queue.put(AndroidMessage('info', 'Robot is ready!'))
-            #self.android_queue.put(AndroidMessage('mode', 'path'))
             self.reconnect_android()
 
         except KeyboardInterrupt:
@@ -290,10 +292,9 @@ class RaspberryPi:
 
             # End of path
             elif command == "FIN":
+                self.img_lock.acquire()
                 self.logger.info(
                     f"At FIN, self.failed_obstacles: {self.failed_obstacles}")
-                self.logger.info(
-                    f"At FIN, self.current_location: {self.current_location}")
                 self.unpause.clear()
                 self.movement_lock.release()
                 self.logger.info("Commands queue finished.")
@@ -318,63 +319,79 @@ class RaspberryPi:
                     self.obstacles[obs['id']] = obs
                 self.request_algo(action.value)
             elif action.cat == "snap":
-                self.snap_and_rec(obstacle_id_with_signal=action.value)
+                self.img_taker(obstacle_id_with_signal=action.value)
             elif action.cat == "stitch":
                 self.request_stitch()
 
-    def snap_and_rec(self, obstacle_id_with_signal: str) -> None:
+    def img_taker(self, obstacle_id_with_signal: str):
         """
-        RPi snaps an image and calls the API for image-rec.
+        RPi snaps an image and put into the queue ready for calling the API for image-rec.
         The response is then forwarded back to the android
         :param obstacle_id_with_signal: the current obstacle ID followed by underscore followed by signal
         """
         obstacle_id, signal = obstacle_id_with_signal.split("_")
+
+        # Capture an image
         self.logger.info(f"Capturing image for obstacle id: {obstacle_id}")
         self.android_queue.put(AndroidMessage(
             "info", f"Capturing image for obstacle id: {obstacle_id}"))
-        url = f"http://{API_IP}:{API_PORT}/image"
-        filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
-
-        # capture an image
+        
         stream = io.BytesIO()
         with picamera.PiCamera() as camera:
             camera.start_preview()
             time.sleep(1)
             camera.capture(stream, format='jpeg')
 
-        self.logger.debug("Requesting from image API")
-
         image_data = stream.getvalue()
-        response = requests.post(
-            url, files={"file": (filename, image_data)}) 
 
-        if response.status_code != 200:
-            self.logger.error(
-                "Something went wrong when requesting path from image-rec API. Please try again.")
-            return
-
-        results = json.loads(response.content)
-
-        self.logger.info(f"results: {results}")
-        self.logger.info(f"self.obstacles: {self.obstacles}")
-        self.logger.info(
-            f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
-
-        if results['image_id'] == 'NA':
-            self.failed_obstacles.append(
-                self.obstacles[int(results['obstacle_id'])])
-            self.logger.info(
-                f"Added Obstacle {results['obstacle_id']} to failed obstacles.")
-            self.logger.info(f"self.failed_obstacles: {self.failed_obstacles}")
-        else:
-            self.success_obstacles.append(
-                self.obstacles[int(results['obstacle_id'])])
-            self.logger.info(
-                f"self.success_obstacles: {self.success_obstacles}")
-            self.android_queue.put(AndroidMessage("image-rec", results))
-            
-        # release lock so that bot can continue moving
+        # Put the info into the queue
+        self.logger.debug("Requesting from image API")
+        self.img_queue.put((obstacle_id_with_signal, image_data))
+        
+        # Release lock so that bot can continue moving
         self.movement_lock.release()
+
+    def img_sender(self) -> None:
+        """
+        [Child Process] 
+        """
+        while True:
+            self.img_lock.acquire()
+            obstacle_id_with_signal, image_data = self.img_queue.get()
+
+            obstacle_id, signal = obstacle_id_with_signal.split("_")
+            url = f"http://{API_IP}:{API_PORT}/image"
+            filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
+
+            response = requests.post(
+                url, files={"file": (filename, image_data)}) 
+
+            if response.status_code != 200:
+                self.logger.error(
+                    "Something went wrong when requesting path from image-rec API. Please try again.")
+                return
+
+            results = json.loads(response.content)
+
+            self.logger.info(f"results: {results}")
+            self.logger.info(f"self.obstacles: {self.obstacles}")
+            self.logger.info(
+                f"Image recognition results: {results} ({SYMBOL_MAP.get(results['image_id'])})")
+
+            if results['image_id'] == 'NA':
+                self.failed_obstacles.append(
+                    self.obstacles[int(results['obstacle_id'])])
+                self.logger.info(
+                    f"Added Obstacle {results['obstacle_id']} to failed obstacles.")
+                self.logger.info(f"self.failed_obstacles: {self.failed_obstacles}")
+            else:
+                self.success_obstacles.append(
+                    self.obstacles[int(results['obstacle_id'])])
+                self.logger.info(
+                    f"self.success_obstacles: {self.success_obstacles}")
+                self.android_queue.put(AndroidMessage("image-rec", results))
+            
+            self.img_lock.release()
 
     def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
         """
@@ -401,20 +418,19 @@ class RaspberryPi:
         # Parse response
         result = json.loads(response.content)['data']
         commands = result['commands']
-        path = result['path']
 
         # Log commands received
         self.logger.debug(f"Commands received from API: {commands}")
 
-        # Put commands and paths into respective queues
+        # Put commands into respective queues
         self.clear_queues()
         for c in commands:
             self.command_queue.put(c)
 
         self.android_queue.put(AndroidMessage(
-            "info", "Commands and path received Algo API. Robot is ready to move."))
+            "info", "Commands received Algo API. Robot is ready to move."))
         self.logger.info(
-            "Commands and path received Algo API. Robot is ready to move.")
+            "Commands received Algo API. Robot is ready to move.")
 
     def request_stitch(self):
         """Sends a stitch request to the image recognition API to stitch the different images together"""
