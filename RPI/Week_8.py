@@ -53,7 +53,7 @@ class RaspberryPi:
         self.unpause = self.manager.Event()
 
         self.movement_lock = self.manager.Lock()
-        self.img_lock = self.manager.Lock()
+        #self.img_lock = self.manager.Lock()
 
         # Messages to send to Android
         self.android_queue = self.manager.Queue()
@@ -74,6 +74,9 @@ class RaspberryPi:
         self.success_obstacles = self.manager.list()
         self.failed_obstacles = self.manager.list()
         self.obstacles = self.manager.dict()
+
+        self.obstacles_count = self.manager.list()
+        self.obstacles_count.append(0)
 
     def start(self):
         """Starts the RPi orchestrator"""
@@ -292,7 +295,9 @@ class RaspberryPi:
 
             # End of path
             elif command == "FIN":
-                self.img_lock.acquire()
+                while (self.obstacles_count[0] != 0):
+                    self.logger.info("Waiting for img rec to finish")
+                    continue
                 self.logger.info(
                     f"At FIN, self.failed_obstacles: {self.failed_obstacles}")
                 self.unpause.clear()
@@ -302,7 +307,7 @@ class RaspberryPi:
                     "info", "Commands queue finished."))
                 self.android_queue.put(AndroidMessage("info", "finished"))
                 self.rpi_action_queue.put(PiAction(cat="stitch", value=""))
-                self.img_lock.release()
+                
             else:
                 raise Exception(f"Unknown command: {command}")
 
@@ -316,6 +321,7 @@ class RaspberryPi:
                 f"PiAction retrieved from queue: {action.cat} {action.value}")
 
             if action.cat == "obstacles":
+                self.obstacles_count[0] = len(action.value['obstacles'])
                 for obs in action.value['obstacles']:
                     self.obstacles[obs['id']] = obs
                 self.request_algo(action.value)
@@ -357,7 +363,6 @@ class RaspberryPi:
         [Child Process] 
         """
         while True:
-            self.img_lock.acquire()
             obstacle_id_with_signal, image_data = self.img_queue.get()
 
             obstacle_id, signal = obstacle_id_with_signal.split("_")
@@ -391,8 +396,8 @@ class RaspberryPi:
                 self.logger.info(
                     f"self.success_obstacles: {self.success_obstacles}")
                 self.android_queue.put(AndroidMessage("image-rec", results))
+            self.obstacles_count[0] -= 1
             
-            self.img_lock.release()
 
     def request_algo(self, data, robot_x=1, robot_y=1, robot_dir=0, retrying=False):
         """
