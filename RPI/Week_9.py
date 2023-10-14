@@ -99,9 +99,6 @@ class RaspberryPi:
 
             # Send success message to Android
             self.android_queue.put(AndroidMessage('info', 'Robot is ready!'))
-            #self.android_queue.put(AndroidMessage('mode', 'path' if self.robot_mode.value == 1 else 'manual'))
-            
-            
             
             # Handover control to the Reconnect Handler to watch over Android connection
             self.reconnect_android()
@@ -187,7 +184,7 @@ class RaspberryPi:
                         self.logger.error("API is down! Start command aborted.")
 
                     self.clear_queues()
-                    self.command_queue.put("RS000") # ack_count = 1
+                    #self.command_queue.put("RS000") # ack_count = 1
                     
                     # Small object direction detection
                     self.small_direction = self.snap_and_rec("Small")
@@ -221,7 +218,7 @@ class RaspberryPi:
             message: str = self.stm_link.recv()
             # Acknowledgement from STM32
             if message.startswith("ACK"):
-                time.sleep(0.05)
+                time.sleep(0.1)
 
                 self.ack_count += 1
 
@@ -252,7 +249,6 @@ class RaspberryPi:
                     
                 # if self.ack_count == 3:
                     except:
-                        time.sleep(2)
                         self.logger.debug("First ACK received, robot finished first obstacle!")
                         self.large_direction = self.snap_and_rec("Large")
                         if self.large_direction == "Left Arrow": 
@@ -295,7 +291,7 @@ class RaspberryPi:
             command: str = self.command_queue.get()
             self.unpause.wait()
             self.movement_lock.acquire()
-            stm32_prefixes = ("STOP", "ZZ", "UL", "UR", "PL", "PR", "RS", "OB")
+            stm32_prefixes = ("STOP", "ZZ", "UL", "UR", "PL", "PR", "RS", "OB") # change this
             if command.startswith(stm32_prefixes):
                 self.stm_link.send(command)
             elif command == "FIN":
@@ -312,10 +308,12 @@ class RaspberryPi:
         while True:
             action: PiAction = self.rpi_action_queue.get()
             self.logger.debug(f"PiAction retrieved from queue: {action.cat} {action.value}")
-            if action.cat == "snap": self.snap_and_rec(obstacle_id=action.value)
-            elif action.cat == "stitch": self.request_stitch()
+            #if action.cat == "snap": 
+            #    self.snap_and_rec(obstacle_id=action.value)
+            if action.cat == "stitch": 
+                self.request_stitch()
 
-    def snap_and_rec(self, obstacle_id: str) -> None:
+    def snap_and_rec(self, obstacle_id: str) -> str:
         """
         RPi snaps an image and calls the API for image-rec.
         The response is then forwarded back to the android
@@ -324,108 +322,37 @@ class RaspberryPi:
         
         self.logger.info(f"Capturing image for obstacle id: {obstacle_id}")
         signal = "C"
+        self.android_queue.put(AndroidMessage(
+            "info", f"Capturing image for obstacle id: {obstacle_id}"))
         url = f"http://{API_IP}:{API_PORT}/image"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
         
+        # capture an image
+        stream = io.BytesIO()
+        with picamera.PiCamera() as camera:
+            camera.start_preview()
+            time.sleep(0.1) # Try reduce this
+            camera.capture(stream, format='jpeg')
+
+        self.logger.debug("Requesting from image API")
+
+        image_data = stream.getvalue()
+        response = requests.post(
+            url, files={"file": (filename, image_data)}) 
         
-        con_file    = "PiLCConfig9.txt"
-        Home_Files  = []
-        Home_Files.append(os.getlogin())
-        config_file = "/home/" + Home_Files[0]+ "/" + con_file
+        if response.status_code != 200:
+            self.logger.error(
+                "Something went wrong when requesting path from image-rec API. Please try again.")
+            return
 
-        extns        = ['jpg','png','bmp','rgb','yuv420','raw']
-        shutters     = [-2000,-1600,-1250,-1000,-800,-640,-500,-400,-320,-288,-250,-240,-200,-160,-144,-125,-120,-100,-96,-80,-60,-50,-48,-40,-30,-25,-20,-15,-13,-10,-8,-6,-5,-4,-3,0.4,0.5,0.6,0.8,1,1.1,1.2,2,3,4,5,6,7,8,9,10,11,15,20,25,30,40,50,60,75,100,112,120,150,200,220,230,239,435]
-        meters       = ['centre','spot','average']
-        awbs         = ['off','auto','incandescent','tungsten','fluorescent','indoor','daylight','cloudy']
-        denoises     = ['off','cdn_off','cdn_fast','cdn_hq']
-
-        config = []
-        with open(config_file, "r") as file:
-            line = file.readline()
-            while line:
-                config.append(line.strip())
-                line = file.readline()
-            config = list(map(int,config))
-        mode        = config[0]
-        speed       = config[1]
-        gain        = config[2]
-        brightness  = config[3]
-        contrast    = config[4]
-        red         = config[6]
-        blue        = config[7]
-        ev          = config[8]
-        extn        = config[15]
-        saturation  = config[19]
-        meter       = config[20]
-        awb         = config[21]
-        sharpness   = config[22]
-        denoise     = config[23]
-        quality     = config[24]
-        
-        retry_count = 0
-        
-        while True:
-        
-            retry_count += 1
-        
-            shutter = shutters[speed]
-            if shutter < 0:
-                shutter = abs(1/shutter)
-            sspeed = int(shutter * 1000000)
-            if (shutter * 1000000) - int(shutter * 1000000) > 0.5:
-                sspeed +=1
-                
-            rpistr = "libcamera-still -e " + extns[extn] + " -n -t 100 -o " + filename
-            rpistr += " --brightness " + str(brightness/100) + " --contrast " + str(contrast/100)
-            rpistr += " --shutter " + str(sspeed)
-            if ev != 0:
-                rpistr += " --ev " + str(ev)
-            if sspeed > 1000000 and mode == 0:
-                rpistr += " --gain " + str(gain) + " --immediate "
-            else:    
-                rpistr += " --gain " + str(gain)
-                if awb == 0:
-                    rpistr += " --awbgains " + str(red/10) + "," + str(blue/10)
-                else:
-                    rpistr += " --awb " + awbs[awb]
-            rpistr += " --metering " + meters[meter]
-            rpistr += " --saturation " + str(saturation/10)
-            rpistr += " --sharpness " + str(sharpness/10)
-            rpistr += " --quality " + str(quality)
-            rpistr += " --denoise "    + denoises[denoise]
-            rpistr += " --metadata - --metadata-format txt >> PiLibtext.txt"
-
-            os.system(rpistr)
-            
-            
-            self.logger.debug("Requesting from image API")
-            
-            response = requests.post(url, files={"file": (filename, open(filename,'rb'))})
-
-            if response.status_code != 200:
-                self.logger.error("Something went wrong when requesting path from image-rec API. Please try again.")
-                return
-
-            results = json.loads(response.content)
-
-            # Higher brightness retry
-            
-            if results['image_id'] != 'NA' or retry_count > 6:
-                break
-            elif retry_count <= 2:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with same shutter speed...")
-            elif retry_count <= 4:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with lower shutter speed...")
-                speed -= 1
-            elif retry_count == 5:
-                self.logger.info(f"Image recognition results: {results}")
-                self.logger.info("Recapturing with lower shutter speed...")
-                speed += 3
+        results = json.loads(response.content)
             
         ans = SYMBOL_MAP.get(results['image_id'])
-        self.logger.info(f"Image recognition results: {results} ({ans})")
+        self.logger.info(f"Image recognition results for {obstacle_id}: {ans}")
+        self.android_queue.put(AndroidMessage("info", f"Image recognition results for {obstacle_id}: {ans}"))
+
+        #self.movement_lock.release() #check this
+
         return ans
 
     def request_stitch(self):

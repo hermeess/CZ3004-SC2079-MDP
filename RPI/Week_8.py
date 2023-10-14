@@ -76,7 +76,6 @@ class RaspberryPi:
         self.obstacles = self.manager.dict()
 
         self.obstacles_count = self.manager.list()
-        self.obstacles_count.append(0)
 
     def start(self):
         """Starts the RPi orchestrator"""
@@ -106,6 +105,8 @@ class RaspberryPi:
             self.proc_img_sender.start()
 
             self.logger.info("Child Processes started")
+
+            self.obstacles_count.append(0)
 
             ### Start up complete ###
 
