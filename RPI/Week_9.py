@@ -154,7 +154,7 @@ class RaspberryPi:
 
             self.android_dropped.clear()
             
-        
+    
     def recv_android(self) -> None:
         """
         [Child Process] Processes the messages received from Android
@@ -218,7 +218,7 @@ class RaspberryPi:
             message: str = self.stm_link.recv()
             # Acknowledgement from STM32
             if message.startswith("ACK"):
-                time.sleep(0.1)
+                time.sleep(0.1) # can reduce this?
 
                 self.ack_count += 1
 
@@ -249,6 +249,9 @@ class RaspberryPi:
                     
                 # if self.ack_count == 3:
                     except:
+                        continue
+                
+                if self.ack_count == 5:
                         self.logger.debug("First ACK received, robot finished first obstacle!")
                         self.large_direction = self.snap_and_rec("Large")
                         if self.large_direction == "Left Arrow": 
@@ -322,8 +325,7 @@ class RaspberryPi:
         
         self.logger.info(f"Capturing image for obstacle id: {obstacle_id}")
         signal = "C"
-        self.android_queue.put(AndroidMessage(
-            "info", f"Capturing image for obstacle id: {obstacle_id}"))
+        self.android_queue.put(AndroidMessage("info", f"Capturing image for obstacle id: {obstacle_id}"))
         url = f"http://{API_IP}:{API_PORT}/image"
         filename = f"{int(time.time())}_{obstacle_id}_{signal}.jpg"
         
