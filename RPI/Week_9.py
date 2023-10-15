@@ -6,7 +6,6 @@ import time
 from multiprocessing import Process, Manager
 import picamera
 from typing import Optional
-import os
 import requests
 from communication.android import AndroidLink, AndroidMessage
 from communication.stm32 import STMLink
@@ -37,9 +36,6 @@ class RaspberryPi:
         # For sharing information between child processes
         self.manager = Manager()
 
-        # Set robot mode to be 1 (Path mode)
-        self.robot_mode = self.manager.Value('i', 1)
-
         # Events
         self.android_dropped = self.manager.Event()  # Set when the android link drops
         # commands will be retrieved from commands queue when this event is set
@@ -60,8 +56,7 @@ class RaspberryPi:
         self.proc_command_follower = None
         self.proc_rpi_action = None
 
-        self.ack_count = 0
-        self.near_flag = self.manager.Lock()
+        #self.near_flag = self.manager.Lock()
 
     def start(self):
         """Starts the RPi orchestrator"""
@@ -84,14 +79,14 @@ class RaspberryPi:
             self.proc_recv_stm32 = Process(target=self.recv_stm)
             self.proc_android_sender = Process(target=self.android_sender)
             self.proc_command_follower = Process(target=self.command_follower)
-            self.proc_rpi_action = Process(target=self.rpi_action)
+            #self.proc_rpi_action = Process(target=self.rpi_action)
 
             # Start child processes
             self.proc_recv_android.start()
             self.proc_recv_stm32.start()
             self.proc_android_sender.start()
             self.proc_command_follower.start()
-            self.proc_rpi_action.start()
+            #self.proc_rpi_action.start()
 
             self.logger.info("Child Processes started")
 
@@ -150,7 +145,6 @@ class RaspberryPi:
 
             self.logger.info("Android child processes restarted")
             self.android_queue.put(AndroidMessage("info", "You are reconnected!"))
-            #self.android_queue.put(AndroidMessage('mode', 'path' if self.robot_mode.value == 1 else 'manual'))
 
             self.android_dropped.clear()
             
@@ -182,27 +176,26 @@ class RaspberryPi:
         
                     if not self.check_api():
                         self.logger.error("API is down! Start command aborted.")
+                        continue
 
                     self.clear_queues()
                     #self.command_queue.put("RS000") # ack_count = 1
                     
                     # Small object direction detection
-                    self.small_direction = self.snap_and_rec("Small")
-                    self.logger.info(f"HERE small direction is: {self.small_direction}")
-                    if self.small_direction == "Left Arrow": 
-                        self.command_queue.put("OB01") # ack_count = 3
-                        self.command_queue.put("UL00") # ack_count = 5
-                    elif self.small_direction == "Right Arrow":
-                        self.command_queue.put("OB01") # ack_count = 3
-                        self.command_queue.put("UR00") # ack_count = 5
+                    #self.small_direction = self.snap_and_rec("Small")
+                    #self.logger.info(f"HERE small direction is: {self.small_direction}")
+                    #if self.small_direction == "Left Arrow": 
+                    #    self.command_queue.put("OB01") # ack_count = 3
+                    #    self.command_queue.put("UL00") # ack_count = 5
+                    #elif self.small_direction == "Right Arrow":
+                    #    self.command_queue.put("OB01") # ack_count = 3
+                    #    self.command_queue.put("UR00") # ack_count = 5
+                    #elif self.small_direction == None or self.small_direction == 'None':
+                    #    self.logger.info("Acquiring near_flag log")
+                    #    self.near_flag.acquire()             
+                    #    self.command_queue.put("OB01") # ack_count = 3
 
-                    elif self.small_direction == None or self.small_direction == 'None':
-                        self.logger.info("Acquiring near_flag log")
-                        self.near_flag.acquire()             
-                        
-                        self.command_queue.put("OB01") # ack_count = 3
-                        
-
+                    self.command_queue.put("OB001")
                     self.logger.info("Start command received, starting robot on Week 9 task!")
                     self.android_queue.put(AndroidMessage('info', 'running'))
 
@@ -213,8 +206,9 @@ class RaspberryPi:
         """
         [Child Process] Receive acknowledgement messages from STM32, and release the movement lock
         """
-        while True:
+        self.ack_count = 0
 
+        while True:
             message: str = self.stm_link.recv()
             # Acknowledgement from STM32
             if message.startswith("ACK"):
@@ -230,45 +224,36 @@ class RaspberryPi:
 
                 self.logger.debug(f"ACK from STM32 received, ACK count now:{self.ack_count}")
                 
-                
                 self.logger.info(f"self.ack_count: {self.ack_count}")
-                if self.ack_count == 3:
-                    try:
-                        self.near_flag.release()
-                        self.logger.debug("First ACK received, robot reached first obstacle!")
-                        self.small_direction = self.snap_and_rec("Small_Near")
-                        if self.small_direction == "Left Arrow": 
-                            self.command_queue.put("UL00") # ack_count = 5
-                        elif self.small_direction == "Right Arrow":
-                            self.command_queue.put("UR00") # ack_count = 5
-                        else:
-                            self.command_queue.put("UL00") # ack_count = 5
-                            self.logger.debug("Failed first one, going left by default!")
-                    # except:
-                        # self.logger.info("No need to release near_flag")
-                    
-                # if self.ack_count == 3:
-                    except:
-                        continue
-                
-                if self.ack_count == 5:
-                        self.logger.debug("First ACK received, robot finished first obstacle!")
-                        self.large_direction = self.snap_and_rec("Large")
-                        if self.large_direction == "Left Arrow": 
-                            self.command_queue.put("PL01") # ack_count = 6
-                        elif self.large_direction == "Right Arrow":
-                            self.command_queue.put("PR01") # ack_count = 6
-                        else:
-                            self.command_queue.put("PR01") # ack_count = 6
-                            self.logger.debug("Failed second one, going right by default!")
 
-                if self.ack_count == 6:
-                    self.logger.debug("Second ACK received from STM32!")
-                    self.android_queue.put(AndroidMessage("info", "finished"))
+                # Decision for smaller obstacles
+                if self.ack_count == 1:
+                    self.logger.debug("First ACK received, robot reached smaller obstacle!")
+                    self.small_direction = self.snap_and_rec("Small")
+                    if self.small_direction == "Left Arrow": 
+                        self.command_queue.put("UL000")
+                    elif self.small_direction == "Right Arrow":
+                        self.command_queue.put("UR000")
+                    else:
+                        self.command_queue.put("UL000")
+                        self.logger.debug("Failed first one, going left by default!")
+                
+                # Decision for larger obstacles
+                if self.ack_count == 2:
+                    self.logger.debug("Second ACK received, robot finished smaller obstacle and reached larger obstacle!")
+                    self.large_direction = self.snap_and_rec("Large")
+                    if self.large_direction == "Left Arrow": 
+                        self.command_queue.put("PL000")
+                    elif self.large_direction == "Right Arrow":
+                        self.command_queue.put("PR000")
+                    else:
+                        self.command_queue.put("PR000")
+                        self.logger.debug("Failed second one, going right by default!")
+
+                if self.ack_count == 3:
+                    self.logger.debug("Third ACK received from STM32!")
                     self.command_queue.put("FIN")
 
-                # except Exception:
-                #     self.logger.warning("Tried to release a released lock!")
             else:
                 self.logger.warning(
                     f"Ignored unknown message from STM: {message}")
@@ -303,18 +288,9 @@ class RaspberryPi:
                 self.logger.info("Commands queue finished.")
                 self.android_queue.put(AndroidMessage("info", "Commands queue finished."))
                 self.android_queue.put(AndroidMessage("info", "finished"))
-                self.rpi_action_queue.put(PiAction(cat="stitch", value=""))
+                self.request_stitch()
             else:
                 raise Exception(f"Unknown command: {command}")
-
-    def rpi_action(self):
-        while True:
-            action: PiAction = self.rpi_action_queue.get()
-            self.logger.debug(f"PiAction retrieved from queue: {action.cat} {action.value}")
-            #if action.cat == "snap": 
-            #    self.snap_and_rec(obstacle_id=action.value)
-            if action.cat == "stitch": 
-                self.request_stitch()
 
     def snap_and_rec(self, obstacle_id: str) -> str:
         """
@@ -352,8 +328,6 @@ class RaspberryPi:
         ans = SYMBOL_MAP.get(results['image_id'])
         self.logger.info(f"Image recognition results for {obstacle_id}: {ans}")
         self.android_queue.put(AndroidMessage("info", f"Image recognition results for {obstacle_id}: {ans}"))
-
-        #self.movement_lock.release() #check this
 
         return ans
 
