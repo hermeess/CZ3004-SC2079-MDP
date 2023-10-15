@@ -13,19 +13,6 @@ from consts import SYMBOL_MAP
 from logger import prepare_logger
 from settings import API_IP, API_PORT
 
-class PiAction:
-    def __init__(self, cat, value):
-        self._cat = cat
-        self._value = value
-
-    @property
-    def cat(self):
-        return self._cat
-
-    @property
-    def value(self):
-        return self._value
-
 class RaspberryPi:
     def __init__(self):
         # Initialize logger and communication objects with Android and STM
@@ -46,7 +33,7 @@ class RaspberryPi:
 
         # Queues
         self.android_queue = self.manager.Queue() # Messages to send to Android
-        self.rpi_action_queue = self.manager.Queue() # Messages that need to be processed by RPi
+        #self.rpi_action_queue = self.manager.Queue() # Messages that need to be processed by RPi
         self.command_queue = self.manager.Queue() # Messages that need to be processed by STM32, as well as snap commands
 
         # Define empty processes
@@ -54,7 +41,7 @@ class RaspberryPi:
         self.proc_recv_stm32 = None
         self.proc_android_sender = None
         self.proc_command_follower = None
-        self.proc_rpi_action = None
+        #self.proc_rpi_action = None
 
         #self.near_flag = self.manager.Lock()
 
@@ -195,7 +182,7 @@ class RaspberryPi:
                     #    self.near_flag.acquire()             
                     #    self.command_queue.put("OB01") # ack_count = 3
 
-                    self.command_queue.put("OB001")
+                    self.command_queue.put("OB000")
                     self.logger.info("Start command received, starting robot on Week 9 task!")
                     self.android_queue.put(AndroidMessage('info', 'running'))
 
@@ -228,7 +215,7 @@ class RaspberryPi:
 
                 # Decision for smaller obstacles
                 if self.ack_count == 1:
-                    self.logger.debug("First ACK received, robot reached smaller obstacle!")
+                    self.logger.debug("1st ACK received, robot reached smaller obstacle!")
                     self.small_direction = self.snap_and_rec("Small")
                     if self.small_direction == "Left Arrow": 
                         self.command_queue.put("UL000")
@@ -240,7 +227,7 @@ class RaspberryPi:
                 
                 # Decision for larger obstacles
                 if self.ack_count == 2:
-                    self.logger.debug("Second ACK received, robot finished smaller obstacle and reached larger obstacle!")
+                    self.logger.debug("2nd ACK received, robot finished smaller obstacle and reached larger obstacle!")
                     self.large_direction = self.snap_and_rec("Large")
                     if self.large_direction == "Left Arrow": 
                         self.command_queue.put("PL000")
@@ -251,7 +238,7 @@ class RaspberryPi:
                         self.logger.debug("Failed second one, going right by default!")
 
                 if self.ack_count == 3:
-                    self.logger.debug("Third ACK received from STM32!")
+                    self.logger.debug("3rd ACK received from STM32!")
                     self.command_queue.put("FIN")
 
             else:
