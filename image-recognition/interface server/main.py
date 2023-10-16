@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from model import *
-#from mainAlgo import *
 from algo.algo import MazeSolver 
 from helper import command_generator
 import time
@@ -42,7 +41,7 @@ def image_rec():
     file.save(os.path.join('uploads', filename))
 
     # TODO: rec_image function in model.py
-    rec_result = rec_image(filename, model, signal)
+    rec_result = rec_image_week9(filename, model, signal)
 
     result = {
         "image_id": str(rec_result['image_id']),
