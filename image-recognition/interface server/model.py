@@ -10,7 +10,7 @@ import math
 
 def load_model():
     # model = torch.hub.load('./', 'custom', path='../weights/Week8_senior.pt', source='local')
-    model = YOLO('../weights/week8_final.pt')
+    model = YOLO('../weights/week9_2.02.pt')
     return model
 
 def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), text_color=(0,0,0)):
@@ -186,7 +186,7 @@ def rec_image(image, model, signal):
 
     return final_rec
 
-def rec_image_week9(image, model, signal):
+def rec_image_week9(image, model):
     
     # load image
     img = Image.open(os.path.join('uploads', image))
@@ -203,19 +203,13 @@ def rec_image_week9(image, model, signal):
     print("-----Recognize results-----")
     for box in result.boxes:
         image_id = result.names[box.cls[0].item()][2:]
-        # bbox = box.xyxy[0].tolist()
-        # bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
         confidence = round(box.conf[0].item(), 3)
 
         print("Image ID:", image_id)
-        # print("Bounding box coordinates:", bbox)
-        # print("Bounding box area: ", bbox_area)
         print("Probability:", confidence)
         
         rec_result.append({
             "image_id": image_id,
-            # "bbox": bbox,
-            # "bbox_area": bbox_area,
             "prob": confidence
         })
 
