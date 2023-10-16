@@ -186,7 +186,7 @@ def rec_image(image, model, signal):
 
     return final_rec
 
-def rec_image_week9(image, model):
+def rec_image_week9(image, model, signal):
     
     # load image
     img = Image.open(os.path.join('uploads', image))
