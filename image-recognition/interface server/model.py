@@ -154,7 +154,7 @@ def rec_image(image, model, signal):
         current_area = filtered_rec_result[0]['bbox_area']
 
         for i in range(len(filtered_rec_result)):
-            if (filtered_rec_result[i]['bbox_area'] >= current_area * 0.8) or (filtered_rec_result[i]['image_id'] == '11' and filtered_rec_result[i][bbox_area] >= current_area * 0.6):
+            if (filtered_rec_result[i]['bbox_area'] >= current_area * 0.8) or (filtered_rec_result[i]['image_id'] == '11' and filtered_rec_result[i]['bbox_area'] >= current_area * 0.6):
                 shortlisted_rec_result.append(filtered_rec_result[i])
 
         # if multiple results remian after filtering by bounding box area
