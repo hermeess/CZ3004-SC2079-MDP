@@ -167,7 +167,7 @@ class RaspberryPi:
 
                     self.clear_queues()
 
-                    self.command_queue.put("OB000")
+                    self.command_queue.put("M1000")
                     self.logger.info("Start command received, starting robot on Week 9 task!")
                     self.android_queue.put(AndroidMessage('info', 'running'))
 
@@ -203,25 +203,30 @@ class RaspberryPi:
                     self.logger.debug("1st ACK received, robot reached smaller obstacle!")
                     self.small_direction = self.snap_and_rec("Small")
                     if self.small_direction == "Left Arrow": 
-                        self.command_queue.put("UL000")
+                        self.command_queue.put("M2000")
+                        self.logger.debug("Going left for smaller obstacle!")
                     elif self.small_direction == "Right Arrow":
-                        self.command_queue.put("UR000")
+                        self.command_queue.put("M2001")
+                        self.logger.debug("Going right for smaller obstacle!")
                     else:
-                        self.command_queue.put("UL000")
-                        self.logger.debug("Failed first one, going left by default!")
+                        self.command_queue.put("M2000")
+                        self.logger.debug("Failed smaller one, going left by default!")
                 
                 # Decision for larger obstacles
                 if self.ack_count == 2:
-                    self.logger.debug("2nd ACK received, robot finished smaller obstacle and reached larger obstacle!")
+                    self.logger.debug("2nd ACK received, robot reached larger obstacle!")
                     self.large_direction = self.snap_and_rec("Large")
                     if self.large_direction == "Left Arrow": 
-                        self.command_queue.put("PL000")
+                        self.command_queue.put("M3000")
+                        self.logger.debug("Going left for larger obstacle!")
                     elif self.large_direction == "Right Arrow":
-                        self.command_queue.put("PR000")
+                        self.command_queue.put("M3001")
+                        self.logger.debug("Going right for larger obstacle!")
                     else:
-                        self.command_queue.put("PR000")
-                        self.logger.debug("Failed second one, going right by default!")
+                        self.command_queue.put("M3000")
+                        self.logger.debug("Failed larger one, going right by default!")
 
+                # Movement complete
                 if self.ack_count == 3:
                     self.logger.debug("3rd ACK received from STM32!")
                     self.command_queue.put("FIN")
@@ -251,7 +256,8 @@ class RaspberryPi:
             command: str = self.command_queue.get()
             self.unpause.wait()
             self.movement_lock.acquire()
-            stm32_prefixes = ("STOP", "ZZ", "UL", "UR", "PL", "PR", "RS", "OB") # change this
+            # M1000; M2000 / M2001; M3000 / M3001
+            stm32_prefixes = ("M") 
             if command.startswith(stm32_prefixes):
                 self.stm_link.send(command)
             elif command == "FIN":
