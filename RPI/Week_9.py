@@ -166,21 +166,6 @@ class RaspberryPi:
                         continue
 
                     self.clear_queues()
-                    #self.command_queue.put("RS000") # ack_count = 1
-                    
-                    # Small object direction detection
-                    #self.small_direction = self.snap_and_rec("Small")
-                    #self.logger.info(f"HERE small direction is: {self.small_direction}")
-                    #if self.small_direction == "Left Arrow": 
-                    #    self.command_queue.put("OB01") # ack_count = 3
-                    #    self.command_queue.put("UL00") # ack_count = 5
-                    #elif self.small_direction == "Right Arrow":
-                    #    self.command_queue.put("OB01") # ack_count = 3
-                    #    self.command_queue.put("UR00") # ack_count = 5
-                    #elif self.small_direction == None or self.small_direction == 'None':
-                    #    self.logger.info("Acquiring near_flag log")
-                    #    self.near_flag.acquire()             
-                    #    self.command_queue.put("OB01") # ack_count = 3
 
                     self.command_queue.put("OB000")
                     self.logger.info("Start command received, starting robot on Week 9 task!")
