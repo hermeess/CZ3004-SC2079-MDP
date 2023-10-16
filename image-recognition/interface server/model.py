@@ -218,6 +218,11 @@ def rec_image_week9(image, model, signal):
     filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
     # by right there should be only one result after filtering out bulleyes
 
+    if len(filtered_rec_result) == 0:
+        return {
+            'image_id': 'NA'
+        }
+    
     return filtered_rec_result[0]
 
 def combine_image():
