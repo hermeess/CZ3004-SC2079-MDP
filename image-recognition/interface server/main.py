@@ -31,7 +31,7 @@ def image_rec():
 
     # Extract the values
     obstacle_id = parts[1]  # <obstacle_id>
-    signal = parts[2].split(".")[0]  # <signal>
+    # signal = parts[2].split(".")[0]  # <signal>
 
     filename = parts[0] + '.jpg' # only leave the timestamp for filename
 
