@@ -66,7 +66,7 @@ def cal_path():
     print("Received algo request")
     content = request.json
 
-    # Get the obstacles, big_turn, retrying, robot_x, robot_y, and robot_direction from the json data
+    # Get the obstacles, big_turn, rec_image_week9, robot_x, robot_y, and robot_direction from the json data
     obstacles = content['obstacles']
     # big_turn = int(content['big_turn'])
     retrying = content['retrying']
