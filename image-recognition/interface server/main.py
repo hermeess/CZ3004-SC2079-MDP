@@ -31,7 +31,7 @@ def image_rec():
 
     # Extract the values
     obstacle_id = parts[1]  # <obstacle_id>
-    # signal = parts[2].split(".")[0]  # <signal>
+    #signal = parts[2].split(".")[0]  # <signal>
 
     filename = parts[0] + '.jpg' # only leave the timestamp for filename
 
@@ -41,7 +41,7 @@ def image_rec():
     file.save(os.path.join('uploads', filename))
 
     # TODO: rec_image function in model.py
-    rec_result = rec_image(filename, model, signal)
+    rec_result = rec_image_week9(filename, model)
 
     result = {
         "image_id": str(rec_result['image_id']),
