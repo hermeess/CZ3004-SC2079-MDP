@@ -21,37 +21,37 @@ def draw_bbox(img, image_name, x1, y1, x2, y2, image_id, color=(255,255,255), te
     y2 = int(y2)
 
     id_to_name = {
-        11: 'Number 1',
-        12: 'Number 2',
-        13: 'Number 3', 
-        14: 'Number 4',
-        15: 'Number 5',
-        16: 'Number 6',
-        17: 'Number 7',
-        18: 'Number 8',
-        19: 'Number 9',
-        20: 'Alphabet A',
-        21: 'Alphabet B',
-        22: 'Alphabet C',
-        23: 'Alphabet D',
-        24: 'Alphabet E',
-        25: 'Alphabet F',
-        26: 'Alphabet G',
-        27: 'Alphabet H',
-        28: 'Alphabet S',
-        29: 'Alphabet T',
-        30: 'Alphabet U',
-        31: 'Alphabet V',
-        32: 'Alphabet W',
-        33: 'Alphabet X',
-        34: 'Alphabet Y',
-        35: 'Alphabet Z',
-        36: 'Up arrow',
-        37: 'Down arrow',
+        # 11: 'Number 1',
+        # 12: 'Number 2',
+        # 13: 'Number 3', 
+        # 14: 'Number 4',
+        # 15: 'Number 5',
+        # 16: 'Number 6',
+        # 17: 'Number 7',
+        # 18: 'Number 8',
+        # 19: 'Number 9',
+        # 20: 'Alphabet A',
+        # 21: 'Alphabet B',
+        # 22: 'Alphabet C',
+        # 23: 'Alphabet D',
+        # 24: 'Alphabet E',
+        # 25: 'Alphabet F',
+        # 26: 'Alphabet G',
+        # 27: 'Alphabet H',
+        # 28: 'Alphabet S',
+        # 29: 'Alphabet T',
+        # 30: 'Alphabet U',
+        # 31: 'Alphabet V',
+        # 32: 'Alphabet W',
+        # 33: 'Alphabet X',
+        # 34: 'Alphabet Y',
+        # 35: 'Alphabet Z',
+        # 36: 'Up arrow',
+        # 37: 'Down arrow',
         38: 'Right arrow',
         39: 'Left arrow',
-        40: 'Stop',
-        99: 'Bulleye'
+        # 40: 'Stop',
+        # 99: 'Bulleye'
     }
 
     if not os.path.exists('image_results'):
@@ -186,7 +186,7 @@ def rec_image(image, model, signal):
 
     return final_rec
 
-def rec_image_week9(image, model, signal):
+def rec_image_week9(image, model):
     
     # load image
     img = Image.open(os.path.join('uploads', image))
@@ -203,13 +203,19 @@ def rec_image_week9(image, model, signal):
     print("-----Recognize results-----")
     for box in result.boxes:
         image_id = result.names[box.cls[0].item()][2:]
+        bbox = box.xyxy[0].tolist()
+        # bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
         confidence = round(box.conf[0].item(), 3)
 
         print("Image ID:", image_id)
+        print("Bounding box coordinates:", bbox)
+        # print("Bounding box area: ", bbox_area)
         print("Probability:", confidence)
         
         rec_result.append({
             "image_id": image_id,
+            "bbox": bbox,
+            # "bbox_area": bbox_area,
             "prob": confidence
         })
 
@@ -223,7 +229,12 @@ def rec_image_week9(image, model, signal):
             'image_id': 'NA'
         }
     
+    final_bbox = filtered_rec_result[0]['bbox']
+    final_id = filtered_rec_result[0]['image_id']
+    draw_bbox(np.array(img),image, final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3], final_id)
+
     return filtered_rec_result[0]
+
 
 def combine_image():
 

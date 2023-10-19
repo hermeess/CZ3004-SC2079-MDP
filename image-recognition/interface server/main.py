@@ -41,7 +41,7 @@ def image_rec():
     file.save(os.path.join('uploads', filename))
 
     # TODO: rec_image function in model.py
-    rec_result = rec_image_week9(filename, model, signal)
+    rec_result = rec_image_week9(filename, model)
 
     result = {
         "image_id": str(rec_result['image_id']),
