@@ -10,6 +10,7 @@ import math
 
 def load_model():
     # model = torch.hub.load('./', 'custom', path='../weights/Week8_senior.pt', source='local')
+    # model = YOLO('../weights/week9_2.02.pt')
     model = YOLO('../weights/week8_final.pt')
     return model
 
@@ -202,7 +203,7 @@ def rec_image_week9(image, model):
 
     print("-----Recognize results-----")
     for box in result.boxes:
-        image_id = result.names[box.cls[0].item()][2:]
+        image_id = result.names[box.cls[0].item()]
         bbox = box.xyxy[0].tolist()
         # bbox_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
         confidence = round(box.conf[0].item(), 3)
@@ -221,8 +222,7 @@ def rec_image_week9(image, model):
 
     rec_result.sort(key=lambda x: x['prob'], reverse=True) # sort by confidence
 
-    filtered_rec_result = [re for re in rec_result if re["image_id"] != '99']
-    # by right there should be only one result after filtering out bulleyes
+    filtered_rec_result = [re for re in rec_result if (re["image_id"] == '39') or (re["image_id"] == '38') ]
 
     if len(filtered_rec_result) == 0:
         return {
